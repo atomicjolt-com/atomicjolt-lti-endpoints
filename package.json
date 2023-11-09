@@ -22,14 +22,14 @@
     "eslint-config-typescript": "^3.0.0",
     "vitest": "^0.34.4",
     "vitest-environment-miniflare": "^2.14.0",
-    "wrangler": "^3.7.0"
+    "wrangler": "^3.15.0"
   },
   "dependencies": {
     "@atomicjolt/lti-client": "^2.4.1",
     "@atomicjolt/lti-server": "file:../atomicjolt-lti-server",
     "@atomicjolt/lti-types": "^1.1.1",
-    "hono": "^3.6.0",
-    "i18next": "^23.2.8",
+    "hono": "^3.9.2",
+    "i18next": "^23.6.0",
     "i18next-browser-languagedetector": "^7.1.0",
     "jose": "^5.1.0"
   }

@@ -67,8 +67,23 @@ export async function verifyRemoteJwt(remoteJwksKV: KVNamespace, jwksUrl: string
   }
 
   const localJwks = createLocalJWKSet(jwks);
-  const payload = await jwtVerify(jwt, localJwks);
-  const token = payload.payload as unknown as IdToken;
+  let token;
+
+  try {
+    const payload = await jwtVerify(jwt, localJwks);
+    token = payload.payload as unknown as IdToken;
+  } catch (e) {
+    if (e instanceof Error && 'code' in e && e.code === 'ERR_JWKS_NO_MATCHING_KEY') {
+      jwks = await fetchRemoteJwks(jwksUrl);
+      console.log('jwks', jwks)
+      await remoteJwksKV.put(jwksUrl, JSON.stringify(jwks));
+      const payload = await jwtVerify(jwt, localJwks);
+      token = payload.payload as unknown as IdToken;
+    } else {
+      throw e;
+    }
+  }
+
   const result: IdTokenResult = {
     verified: true,
     token,
