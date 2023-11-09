@@ -1,0 +1,36 @@
+{
+  "name": "@atomicjolt/lti-endpoints",
+  "version": "1.0.0",
+  "description": "A library of endpoints that can be added to a hono app to handle an LTI launch",
+  "main": "dist/index.js",
+  "typings": "types/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "npx vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "LTI"
+  ],
+  "author": "Atomic Jolt",
+  "license": "MIT",
+  "devDependencies": {
+    "@atomicjolt/lti-types": "^1.0.0",
+    "@cloudflare/workers-types": "^4.20230904.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint-config-typescript": "^3.0.0",
+    "vitest": "^0.34.4",
+    "vitest-environment-miniflare": "^2.14.0",
+    "wrangler": "^3.7.0"
+  },
+  "dependencies": {
+    "@atomicjolt/lti-client": "^2.4.1",
+    "@atomicjolt/lti-server": "file:../atomicjolt-lti-server",
+    "@atomicjolt/lti-types": "^1.1.1",
+    "hono": "^3.6.0",
+    "i18next": "^23.2.8",
+    "i18next-browser-languagedetector": "^7.1.0",
+    "jose": "^5.1.0"
+  }
+}
