@@ -200,7 +200,7 @@ describe('launch', () => {
         'iss': 'fake',
         nonce,
       }
-      const signed = await signJwt(not_id_token, privateKey, not_id_token.iss, not_id_token.aud);
+      const signed = await signJwt(not_id_token, privateKey);
       body.set('id_token', signed);
 
       await storeState(env, state, nonce);
@@ -237,7 +237,7 @@ describe('launch', () => {
 
         delete new_id_token[field];
 
-        const signed = await signJwt(new_id_token, privateKey, new_id_token.iss, new_id_token.aud);
+        const signed = await signJwt(new_id_token, privateKey);
 
         body.set('state', state);
         body.set('id_token', signed);

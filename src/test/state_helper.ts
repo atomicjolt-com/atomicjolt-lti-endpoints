@@ -32,7 +32,7 @@ export async function setupValidState(env: EnvBindings, token: IdToken): Promise
 
   const body: FormData = new FormData();
   const privateKey = await importPKCS8(keySet.privateKey, ALGORITHM);
-  const signed = await signJwt(token, privateKey, token.iss, token.aud);
+  const signed = await signJwt(token, privateKey);
   body.set('id_token', signed);
   body.set('state', state);
   body.set('lti_storage_target', '_parent');
