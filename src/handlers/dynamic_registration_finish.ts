@@ -36,7 +36,7 @@ export async function handleDynamicRegistrationFinish(
   const platformResponse: ToolConfiguration = await response.json()
 
   // Pass the response back to the store so that any required data can be saved  
-  handlePlatformResponse(platformResponse);
+  await handlePlatformResponse(platformResponse, c.env.PLATFORMS);
 
   return c.html(dynamicRegistrationFinishHtml());
 }

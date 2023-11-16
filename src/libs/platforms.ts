@@ -1,5 +1,7 @@
 import * as jose from 'jose';
 import type { Platform } from '@atomicjolt/lti-server/types';
+import type { PlatformConfiguration } from '@atomicjolt/lti-types';
+
 import {
   CANVAS_PUBLIC_JWKS_URL,
   CANVAS_OIDC_URL,
@@ -9,11 +11,10 @@ import {
   CANVAS_BETA_OIDC_URL,
 } from '@atomicjolt/lti-types';
 import type { Platforms } from '@atomicjolt/lti-server/types';
+import { KVNamespace } from '@cloudflare/workers-types';
 
 
-//////////////////////////////////////////////////////
-// TODO these should be dynamic values stored in a database
-export const PLATFORMS: Platforms = {
+export const KNOWN_PLATFORMS: Platforms = {
   'https://canvas.instructure.com': {
     iss: 'https://canvas.instructure.com',
     jwksUrl: CANVAS_PUBLIC_JWKS_URL,
@@ -47,25 +48,41 @@ export const PLATFORMS: Platforms = {
   },
 };
 
+export async function getPlatform(iss: string, platforms_kv: KVNamespace): Promise<Platform> {
+  let platform = KNOWN_PLATFORMS[iss];
 
-export async function getJwkServer(jwt: string): Promise<string> {
+  if (!platform) {
+    const record = await platforms_kv.get(iss);
+    if (record) {
+      const config: PlatformConfiguration = JSON.parse(record);
+      platform = {
+        iss: config.issuer,
+        jwksUrl: config.jwks_uri,
+        tokenUrl: config.token_endpoint,
+        oidcUrl: config.authorization_endpoint,
+      };
+    }
+  }
+
+  if (!platform) {
+    throw new Error(`Unable to resolve platform information for iss: ${iss}`);
+  }
+
+  return platform;
+}
+
+export async function getJwkServer(jwt: string, platforms_kv: KVNamespace): Promise<string> {
   const decoded = jose.decodeJwt(jwt);
   const iss = decoded?.iss;
   if (!iss) {
     throw new Error('LTI token is missing required field iss.');
   }
-  const platform = PLATFORMS[iss];
-  if (!platform) {
-    throw new Error(`Unable to resolve platform information for iss: ${iss}`);
-  }
+  const platform = await getPlatform(iss, platforms_kv);
   return platform.jwksUrl;
 }
 
-export function getPlatformOIDCUrl(iss: string): string {
+export async function getPlatformOIDCUrl(iss: string, platforms_kv: KVNamespace): Promise<string> {
   // Use the iss to get the platform OIDC
-  const platform: Platform | undefined = PLATFORMS[iss];
-  if (!platform) {
-    throw new Error(`Unable to resolve platform information for iss: ${iss}`);
-  }
+  const platform = await getPlatform(iss, platforms_kv);
   return platform.oidcUrl;
 }

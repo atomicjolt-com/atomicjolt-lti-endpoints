@@ -1,7 +1,11 @@
 import type { Context } from 'hono';
 import type { PlatformConfiguration } from '@atomicjolt/lti-types';
 
-async function handleDynamicRegistrationInit(c: Context, dynamicRegistrationHtml: Function): Promise<Response> {
+async function handleDynamicRegistrationInit(
+  c: Context,
+  dynamicRegistrationHtml: Function,
+  handlePlatformConfiguration: Function
+): Promise<Response> {
   const formData = await c.req.formData();
   const registrationToken = formData.get('registration_token') as string;
   const openidConfigurationUrl = formData.get('openid_configuration') as string;
@@ -14,6 +18,8 @@ async function handleDynamicRegistrationInit(c: Context, dynamicRegistrationHtml
   if (new URL(openidConfigurationUrl).host !== new URL(platformConfiguration.issuer).host) {
     throw new Error('Invalid Issuer in platform configuration.');
   }
+
+  await handlePlatformConfiguration(platformConfiguration, c.env.PLATFORMS);
 
   // Generate the UI to present to the user during install
   return c.html(dynamicRegistrationHtml(platformConfiguration, registrationToken));

@@ -54,7 +54,7 @@ export async function handleLaunch(c: Context, hashedScriptName: string): Promis
   }
 
   const iss = idTokenResult.token['iss'];
-  const platformOIDCUrl = getPlatformOIDCUrl(iss);
+  const platformOIDCUrl = await getPlatformOIDCUrl(iss, c.env.PLATFORMS);
   if (!platformOIDCUrl) {
     return new Response(`Unable to find a platform OIDC URL matching for iss: ${iss} `, {
       status: 401,

@@ -72,6 +72,7 @@ export type EnvBindings = {
   JWKS: KVNamespace;
   REMOTE_JWKS: KVNamespace;
   JWT_KEYS: KVNamespace;
+  PLATFORMS: KVNamespace;
   OIDC_STATE: DurableObjectNamespace;
 }
 

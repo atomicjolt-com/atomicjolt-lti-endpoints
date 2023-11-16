@@ -92,9 +92,9 @@ export async function verifyRemoteJwt(remoteJwksKV: KVNamespace, jwksUrl: string
   return result;
 }
 
-export async function validateIdToken(idToken: string, jwks_kv: KVNamespace): Promise<IdTokenResult> {
+export async function validateIdToken(idToken: string, jwks_kv: KVNamespace, platforms_kv: KVNamespace): Promise<IdTokenResult> {
   try {
-    const jwksUrl = await getJwkServer(idToken);
+    const jwksUrl = await getJwkServer(idToken, platforms_kv);
     const idTokenResult = await verifyRemoteJwt(jwks_kv, jwksUrl, idToken);
     if (!idTokenResult.token || !idTokenResult.verified) {
       throw new Error('Invalid tool launch. Please launch the application again.');

@@ -14,7 +14,7 @@ export async function validateRequest(
     throw new Error('Missing state. Please launch the application again.');
   }
 
-  const idTokenResult = await validateIdToken(idToken, c.env.REMOTE_JWKS);
+  const idTokenResult = await validateIdToken(idToken, c.env.REMOTE_JWKS, c.env.PLATFORMS);
   const oidcState = await getOIDC(c, state);
   if (state !== oidcState.state) {
     throw new Error('Incorrect LTI state. Please launch the application again.');

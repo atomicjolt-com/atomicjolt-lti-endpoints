@@ -32,7 +32,7 @@ async function handleInit(c: Context, hashedScriptName: string): Promise<Respons
     });
   }
 
-  const platformOIDCUrl = getPlatformOIDCUrl(iss);
+  const platformOIDCUrl = await getPlatformOIDCUrl(iss, c.env.PLATFORMS);
   const { oidcState, url, settings } = buildInit(
     requestUrl,
     clientId,
