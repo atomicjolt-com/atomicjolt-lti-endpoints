@@ -6,6 +6,7 @@ import { getPlatform } from '../models/platforms';
 import initHtml from '../html/init_html';
 import { setOIDC } from '../models/oidc';
 import { PlatformConfiguration } from '@atomicjolt/lti-types';
+import { LTIInitBody } from '@atomicjolt/lti-server/types';
 
 function writeCookie(c: Context, name: string, value: string, maxAge: number) {
   setCookie(c, name, value, {
@@ -20,14 +21,9 @@ function writeCookie(c: Context, name: string, value: string, maxAge: number) {
 
 async function handleInit(c: Context, hashedScriptName: string): Promise<Response> {
   const requestUrl = c.req.url;
-  const formData = await c.req.formData();
-  const target = formData.get('lti_storage_target') as string;
-  const ltiMessageHint = formData.get('lti_message_hint') as string;
-  const loginHint = formData.get('login_hint') as string;
-  const clientId = formData.get('client_id') as string;
-  const iss = formData.get('iss') as string;
+  const body = (await c.req.parseBody()) as unknown as LTIInitBody;
 
-  if (iss === null) {
+  if (body.iss === null) {
     return new Response('Request is missing required field iss', {
       status: 401,
     });
@@ -35,7 +31,7 @@ async function handleInit(c: Context, hashedScriptName: string): Promise<Respons
 
   let platform: PlatformConfiguration;
   try {
-    platform = await getPlatform(c.env, iss);
+    platform = await getPlatform(c.env, body.iss);
   } catch (e) {
     return new Response(e as string, {
       status: 401,
@@ -44,10 +40,10 @@ async function handleInit(c: Context, hashedScriptName: string): Promise<Respons
 
   const { oidcState, url, settings } = buildInit(
     requestUrl,
-    clientId,
-    loginHint,
-    ltiMessageHint,
-    target,
+    body.client_id,
+    body.login_hint,
+    body.lti_message_hint,
+    body.lti_storage_target,
     platform.authorization_endpoint
   );
 

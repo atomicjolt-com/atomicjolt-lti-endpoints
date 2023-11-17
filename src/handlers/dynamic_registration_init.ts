@@ -6,9 +6,9 @@ async function handleDynamicRegistrationInit(
   c: Context,
   dynamicRegistrationHtml: Function
 ): Promise<Response> {
-  const formData = await c.req.formData();
-  const registrationToken = formData.get('registration_token') as string;
-  const openidConfigurationUrl = formData.get('openid_configuration') as string;
+  // Get the registration token and openid configuration URL from the query string
+  const registrationToken = c.req.query('registration_token') as string;
+  const openidConfigurationUrl = c.req.query('openid_configuration') as string;
 
   // Get the platform configuration
   const response = await fetch(openidConfigurationUrl);

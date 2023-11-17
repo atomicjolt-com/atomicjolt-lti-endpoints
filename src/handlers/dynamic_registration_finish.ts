@@ -37,6 +37,7 @@ export async function handleDynamicRegistrationFinish(
   });
   const platformResponse: ToolConfiguration = await response.json()
   console.log(platformResponse);
+
   // TODO store client id or deployment id here as needed
   // platformResponse.client_id
   // platformResponse['https://purl.imsglobal.org/spec/lti-tool-configuration'].deployment_id
