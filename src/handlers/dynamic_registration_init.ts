@@ -1,10 +1,10 @@
 import type { Context } from 'hono';
 import type { PlatformConfiguration } from '@atomicjolt/lti-types';
+import { setPlatform } from '../models/platforms';
 
 async function handleDynamicRegistrationInit(
   c: Context,
-  dynamicRegistrationHtml: Function,
-  handlePlatformConfiguration: Function
+  dynamicRegistrationHtml: Function
 ): Promise<Response> {
   const formData = await c.req.formData();
   const registrationToken = formData.get('registration_token') as string;
@@ -19,7 +19,8 @@ async function handleDynamicRegistrationInit(
     throw new Error('Invalid Issuer in platform configuration.');
   }
 
-  await handlePlatformConfiguration(c.env, platformConfiguration);
+  // Store the platform configuration
+  await setPlatform(c.env, platformConfiguration.issuer, platformConfiguration);
 
   // Generate the UI to present to the user during install
   return c.html(dynamicRegistrationHtml(platformConfiguration, registrationToken));

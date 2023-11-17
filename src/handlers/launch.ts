@@ -2,8 +2,8 @@ import type { Context } from 'hono';
 import { getCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
 import type { LaunchSettings } from '@atomicjolt/lti-client/types';
-import { IdToken } from '@atomicjolt/lti-types';
-import type { LTIRequestBody, Platform } from '@atomicjolt/lti-server/types';
+import { IdToken, PlatformConfiguration } from '@atomicjolt/lti-types';
+import type { LTIRequestBody, } from '@atomicjolt/lti-server/types';
 import { getLtiStorageParams } from '@atomicjolt/lti-server';
 import { OPEN_ID_COOKIE_PREFIX } from '@atomicjolt/lti-server';
 import { validateIdTokenContents } from '@atomicjolt/lti-server';
@@ -51,7 +51,7 @@ export async function handleLaunch(c: Context, hashedScriptName: string): Promis
   }
 
   const iss = idToken['iss'];
-  let platform: Platform;
+  let platform: PlatformConfiguration;
   try {
     platform = await getPlatform(c.env, iss);
   } catch (e) {
@@ -60,7 +60,7 @@ export async function handleLaunch(c: Context, hashedScriptName: string): Promis
     });
   }
 
-  if (!platform.oidcUrl) {
+  if (!platform.authorization_endpoint) {
     return new Response(`Unable to find a platform OIDC URL matching for iss: ${iss} `, {
       status: 401,
     });
@@ -73,7 +73,7 @@ export async function handleLaunch(c: Context, hashedScriptName: string): Promis
     });
   }
 
-  const ltiStorageParams = getLtiStorageParams(platform.oidcUrl, target);
+  const ltiStorageParams = getLtiStorageParams(platform.authorization_endpoint, target);
 
   const settings: LaunchSettings = {
     stateVerified,

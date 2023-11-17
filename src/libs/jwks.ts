@@ -23,7 +23,7 @@ export function getIss(jwt: string): string {
 export async function getJwkServer(env: EnvBindings, jwt: string): Promise<string> {
   const iss = getIss(jwt);
   const platform = await getPlatform(env, iss);
-  return platform.jwksUrl;
+  return platform.jwks_uri;
 }
 
 export async function validateRemoteJwt(env: EnvBindings, jwksUrl: string, jwt: string): Promise<JwtValidationResult> {

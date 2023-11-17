@@ -11,8 +11,7 @@ export type SecureJsonHeaders = {
 // Finishes the registration process
 export async function handleDynamicRegistrationFinish(
   c: Context,
-  toolConfiguration: ToolConfiguration,
-  handlePlatformResponse: Function,
+  getToolConfiguration: Function,
 ): Promise<Response> {
 
   const formData = await c.req.formData();
@@ -24,19 +23,23 @@ export async function handleDynamicRegistrationFinish(
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
+
   if (registrationToken) {
     headers['AUTHORIZATION'] = `Bearer ${registrationToken}`;
   }
 
+  const host = (new URL(c.req.url)).host;
+  const toolConfiguration = getToolConfiguration(host);
   const response = await fetch(registrationEndpoint, {
     method: 'POST',
     headers,
     body: JSON.stringify(toolConfiguration)
   });
   const platformResponse: ToolConfiguration = await response.json()
-
-  // Pass the response back to the store so that any required data can be saved  
-  await handlePlatformResponse(platformResponse, c.env);
+  console.log(platformResponse);
+  // TODO store client id or deployment id here as needed
+  // platformResponse.client_id
+  // platformResponse['https://purl.imsglobal.org/spec/lti-tool-configuration'].deployment_id
 
   return c.html(dynamicRegistrationFinishHtml());
 }

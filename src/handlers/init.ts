@@ -5,7 +5,7 @@ import { OPEN_ID_COOKIE_PREFIX, OPEN_ID_STORAGE_COOKIE } from '@atomicjolt/lti-s
 import { getPlatform } from '../models/platforms';
 import initHtml from '../html/init_html';
 import { setOIDC } from '../models/oidc';
-import { Platform } from '@atomicjolt/lti-server/types';
+import { PlatformConfiguration } from '@atomicjolt/lti-types';
 
 function writeCookie(c: Context, name: string, value: string, maxAge: number) {
   setCookie(c, name, value, {
@@ -33,7 +33,7 @@ async function handleInit(c: Context, hashedScriptName: string): Promise<Respons
     });
   }
 
-  let platform: Platform;
+  let platform: PlatformConfiguration;
   try {
     platform = await getPlatform(c.env, iss);
   } catch (e) {
@@ -48,7 +48,7 @@ async function handleInit(c: Context, hashedScriptName: string): Promise<Respons
     loginHint,
     ltiMessageHint,
     target,
-    platform.oidcUrl
+    platform.authorization_endpoint
   );
 
   await setOIDC(c.env, oidcState);

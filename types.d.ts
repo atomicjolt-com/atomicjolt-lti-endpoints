@@ -9,7 +9,6 @@ import type {
 
 export interface Platform {
   iss: string;
-  clientId: string;
   jwksUrl: string;
   tokenUrl: string;
   oidcUrl: string;
