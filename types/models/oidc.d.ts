@@ -1,5 +1,6 @@
-import type { Context } from 'hono';
 import type { OIDCState } from '@atomicjolt/lti-server/types';
-export declare function setOIDC(c: Context, oidcState: OIDCState): Promise<void>;
-export declare function getOIDC(c: Context, state: string): Promise<OIDCState>;
+import type { EnvBindings } from '../../types';
+export declare function setOIDC(env: EnvBindings, oidcState: OIDCState): Promise<void>;
+export declare function getOIDC(env: EnvBindings, state: string): Promise<OIDCState>;
+export declare function deleteOIDC(env: EnvBindings, state: string): Promise<void>;
 //# sourceMappingURL=oidc.d.ts.map

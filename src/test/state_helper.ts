@@ -6,7 +6,9 @@ import {
 import type { OIDCState } from '@atomicjolt/lti-server/types';
 import { ALGORITHM, generateKeySet, keySetsToJwks, signJwt } from '@atomicjolt/lti-server';
 import type { EnvBindings } from '../../types';
-import { JWKS_KV_KEY } from '../libs/jwt';
+import { deleteJWKs, JWKS_KEY } from '../models/jwks';
+import { setOIDC } from '../models/oidc';
+import { setRemoteJWKs } from '../models/remote_jwks';
 
 export async function storeState(env: EnvBindings, state: string, nonce: string) {
   const oidcState: OIDCState = {
@@ -14,18 +16,18 @@ export async function storeState(env: EnvBindings, state: string, nonce: string)
     nonce: nonce,
     datetime: new Date().toISOString(),
   };
-  await env.OIDC.put(state, JSON.stringify(oidcState));
+  await setOIDC(env, oidcState);
 }
 
 export async function setupValidState(env: EnvBindings, token: IdToken): Promise<{ state: string, body: FormData, privateKey: KeyLike }> {
   // Clean out entries
-  await env.JWKS.delete(JWKS_KV_KEY);
-  await env.JWKS.delete(CANVAS_PUBLIC_JWKS_URL);
+  await deleteJWKs(env, JWKS_KEY);
+  await deleteJWKs(env, CANVAS_PUBLIC_JWKS_URL);
 
   // Setup jwks for remote
   const keySet = await generateKeySet();
   const jwks = await keySetsToJwks([keySet]);
-  await env.REMOTE_JWKS.put(CANVAS_PUBLIC_JWKS_URL, JSON.stringify(jwks));
+  await setRemoteJWKs(env, CANVAS_PUBLIC_JWKS_URL, jwks);
 
   const state = crypto.randomUUID();
   await storeState(env, state, token.nonce);

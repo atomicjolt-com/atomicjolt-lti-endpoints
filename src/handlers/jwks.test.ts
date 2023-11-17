@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { expect, it, describe } from 'vitest';
-import type { JWKS_RESULT } from '@atomicjolt/lti-server/types';
-import { EnvBindings } from '../../types';
+import type { jwksResult } from '@atomicjolt/lti-server/types';
+import type { EnvBindings } from '../../types';
 import { handleJwks } from './jwks';
 
 const env = getMiniflareBindings();
@@ -21,9 +21,8 @@ describe('JWKS Worker', () => {
       },
     );
     const resp = await app.fetch(req, env);
-
     expect(resp.status).toBe(200);
-    const json: JWKS_RESULT = await resp.json();
+    const json: jwksResult = await resp.json();
     expect(json.keys.length).toBe(1);
     expect(json.keys[0]?.kty).toEqual('RSA');
   });

@@ -3,24 +3,21 @@ import { getCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
 import type { LaunchSettings } from '@atomicjolt/lti-client/types';
 import { IdToken } from '@atomicjolt/lti-types';
-import type { IdTokenResult, LTIRequestBody } from '@atomicjolt/lti-server/types';
+import type { LTIRequestBody, Platform } from '@atomicjolt/lti-server/types';
 import { getLtiStorageParams } from '@atomicjolt/lti-server';
 import { OPEN_ID_COOKIE_PREFIX } from '@atomicjolt/lti-server';
 import { validateIdTokenContents } from '@atomicjolt/lti-server';
 import { validateRequest } from '../libs/validate';
 import launchHtml from '../html/launch_html';
-import { getPlatformOIDCUrl } from '../libs/platforms';
-
+import { getPlatform } from '../models/platforms';
+import { deleteOIDC } from '../models/oidc';
 
 export async function handleLaunch(c: Context, hashedScriptName: string): Promise<Response> {
   const body = (await c.req.parseBody()) as unknown as LTIRequestBody;
-  let idTokenResult: IdTokenResult;
+  let idToken: IdToken;
 
   try {
-    idTokenResult = await validateRequest(c, body.state, body.id_token);
-    if (!idTokenResult || !idTokenResult.token) {
-      throw new Error('Missing LTI token.');
-    }
+    idToken = await validateRequest(c, body.state, body.id_token);
   } catch (e) {
     const res = new Response((e as Error).message, {
       status: 401,
@@ -28,8 +25,8 @@ export async function handleLaunch(c: Context, hashedScriptName: string): Promis
     throw new HTTPException(401, { res });
   }
 
-  // Remove the state from the KV store
-  await c.env.OIDC.delete(body.state);
+  // Remove the state
+  await deleteOIDC(c.env, body.state);
 
   // Check to see if a cookie exists for the state
   let stateVerified = false;
@@ -38,14 +35,14 @@ export async function handleLaunch(c: Context, hashedScriptName: string): Promis
     stateVerified = true;
   }
 
-  if (!idTokenResult.token) {
+  if (!idToken) {
     return new Response('Missing LTI token.', {
       status: 401,
     });
   }
 
   const requestedTargetLinkUri = c.req.url;
-  const errors = validateIdTokenContents(idTokenResult.token, requestedTargetLinkUri, true);
+  const errors = validateIdTokenContents(idToken, requestedTargetLinkUri, true);
   if (errors.length > 0) {
     const message = `Invalid LTI token: ${errors.join(', ')}.`;
     return new Response(message, {
@@ -53,9 +50,17 @@ export async function handleLaunch(c: Context, hashedScriptName: string): Promis
     });
   }
 
-  const iss = idTokenResult.token['iss'];
-  const platformOIDCUrl = await getPlatformOIDCUrl(iss, c.env.PLATFORMS);
-  if (!platformOIDCUrl) {
+  const iss = idToken['iss'];
+  let platform: Platform;
+  try {
+    platform = await getPlatform(c.env, iss);
+  } catch (e) {
+    return new Response(e as string, {
+      status: 401,
+    });
+  }
+
+  if (!platform.oidcUrl) {
     return new Response(`Unable to find a platform OIDC URL matching for iss: ${iss} `, {
       status: 401,
     });
@@ -68,11 +73,11 @@ export async function handleLaunch(c: Context, hashedScriptName: string): Promis
     });
   }
 
-  const ltiStorageParams = getLtiStorageParams(platformOIDCUrl, target);
+  const ltiStorageParams = getLtiStorageParams(platform.oidcUrl, target);
 
   const settings: LaunchSettings = {
     stateVerified,
-    idToken: idTokenResult.token as IdToken,
+    idToken: idToken as IdToken,
     state: body.state,
     ltiStorageParams,
   };

@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { expect, it, describe } from 'vitest';
 import { OPEN_ID_COOKIE_PREFIX, OPEN_ID_STORAGE_COOKIE } from '@atomicjolt/lti-server';
-import { EnvBindings } from '../../types';
+import type { EnvBindings } from '../../types';
 import { handleInit } from './init';
 
 const env = getMiniflareBindings();

@@ -22,7 +22,7 @@ test('getOIDC returns OIDC state', async (_t) => {
     },
   } as any;
 
-  const result = await getOIDC(c, state);
+  const result = await getOIDC(c.env, state);
 
   expect(result).toEqual(oidcState);
 });
@@ -39,7 +39,7 @@ test('getOIDC throws error for missing OIDC state', async (_t) => {
     },
   } as any;
 
-  await expect(getOIDC(c, state)).rejects.toThrow('Missing LTI state. Please launch the application again.');
+  await expect(getOIDC(c.env, state)).rejects.toThrow('Missing LTI state. Please launch the application again.');
 
 
 });

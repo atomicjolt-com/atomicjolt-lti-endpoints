@@ -8,6 +8,7 @@ import { OPEN_ID_COOKIE_PREFIX, signJwt, TEST_ID_TOKEN, genJwt } from '@atomicjo
 import type { EnvBindings } from '../../types';
 import { setupValidState, storeState } from '../test/state_helper';
 import { handleLaunch } from './launch';
+import { deleteOIDC } from '../models/oidc';
 
 const app = new Hono<{ Bindings: EnvBindings }>();
 const initHashedScriptName = 'init.1234.js';
@@ -31,7 +32,7 @@ describe('launch', () => {
     expect(text).toContain('"stateVerified":false');
 
     // Clean up
-    await env.OIDC.delete(state);
+    await deleteOIDC(env, state);
   });
 
   it('returns a 401 when cookie is not present and lti_storage_target is empty', async () => {
@@ -52,14 +53,14 @@ describe('launch', () => {
     expect(text).toContain('Unable to securely launch tool. Please ensure cookies are enabled');
 
     // Clean up
-    await env.OIDC.delete(state);
+    await deleteOIDC(env, state);
   });
 
   it('fails when the state value in the cookie cannot be found in KV', async () => {
     const { body, state } = await setupValidState(env, TEST_ID_TOKEN);
 
     // Remove state from KV for test
-    await env.OIDC.delete(state);
+    await deleteOIDC(env, state);
     const req = new Request(
       'http://example.com/lti/launch',
       {
@@ -106,7 +107,6 @@ describe('launch', () => {
       const body = new FormData();
 
       // Generate a new jwt that will have a KID not present
-      // in c.env.REMOTE_JWKS
       const { signed } = await genJwt();
       body.set('id_token', signed);
       body.set('state', state);
@@ -223,7 +223,7 @@ describe('launch', () => {
       expect(text).toContain('An error occured while launching the tool. Please launch the application again.');
 
       // Clean up
-      await env.OIDC.delete(state);
+      await deleteOIDC(env, state);
     });
 
     // Test Description: One or more JWT fields missing
@@ -262,7 +262,7 @@ describe('launch', () => {
         expect(text).toContain(field);
 
         // Clean up
-        await env.OIDC.delete(state);
+        await deleteOIDC(env, state);
       }
 
       await runTest('iss');
@@ -272,7 +272,7 @@ describe('launch', () => {
       await runTest(MESSAGE_TYPE);
 
       // Clean up
-      await env.OIDC.delete(state);
+      await deleteOIDC(env, state);
     });
   });
 
@@ -295,6 +295,6 @@ describe('launch', () => {
     expect(text).toContain('"stateVerified":true');
 
     // Clean up
-    await env.OIDC.delete(state);
+    await deleteOIDC(env, state);
   });
 });

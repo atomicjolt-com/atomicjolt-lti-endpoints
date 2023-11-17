@@ -2,9 +2,10 @@ import type { Context } from 'hono';
 import { getCookie, setCookie } from 'hono/cookie';
 import { buildInit } from '@atomicjolt/lti-server';
 import { OPEN_ID_COOKIE_PREFIX, OPEN_ID_STORAGE_COOKIE } from '@atomicjolt/lti-server';
-import { getPlatformOIDCUrl } from '../libs/platforms';
+import { getPlatform } from '../models/platforms';
 import initHtml from '../html/init_html';
 import { setOIDC } from '../models/oidc';
+import { Platform } from '@atomicjolt/lti-server/types';
 
 function writeCookie(c: Context, name: string, value: string, maxAge: number) {
   setCookie(c, name, value, {
@@ -32,17 +33,25 @@ async function handleInit(c: Context, hashedScriptName: string): Promise<Respons
     });
   }
 
-  const platformOIDCUrl = await getPlatformOIDCUrl(iss, c.env.PLATFORMS);
+  let platform: Platform;
+  try {
+    platform = await getPlatform(c.env, iss);
+  } catch (e) {
+    return new Response(e as string, {
+      status: 401,
+    });
+  }
+
   const { oidcState, url, settings } = buildInit(
     requestUrl,
     clientId,
     loginHint,
     ltiMessageHint,
     target,
-    platformOIDCUrl
+    platform.oidcUrl
   );
 
-  await setOIDC(c, oidcState);
+  await setOIDC(c.env, oidcState);
 
   writeCookie(c, OPEN_ID_STORAGE_COOKIE, '1', 356 * 24 * 60 * 60);
   writeCookie(c, `${OPEN_ID_COOKIE_PREFIX}${oidcState.state}`, '1', 60);

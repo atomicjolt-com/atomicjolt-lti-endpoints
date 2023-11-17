@@ -1,24 +1,26 @@
 import type { Context } from 'hono';
-import type { IdTokenResult } from '@atomicjolt/lti-server/types';
+import type { IdToken } from '@atomicjolt/lti-server/types';
 import { validateNonce } from '@atomicjolt/lti-server';
-import { validateIdToken } from './jwt';
 import { getOIDC } from '../models/oidc';
+import { validateIdToken } from './jwks';
 
 export async function validateRequest(
   c: Context,
   state: string,
   idToken: string
-): Promise<IdTokenResult> {
+): Promise<IdToken> {
 
   if (!state) {
     throw new Error('Missing state. Please launch the application again.');
   }
 
-  const idTokenResult = await validateIdToken(idToken, c.env.REMOTE_JWKS, c.env.PLATFORMS);
-  const oidcState = await getOIDC(c, state);
+  const validatedIdToken = await validateIdToken(idToken, c.env);
+  const oidcState = await getOIDC(c.env, state);
   if (state !== oidcState.state) {
     throw new Error('Incorrect LTI state. Please launch the application again.');
   }
-  validateNonce(oidcState, idTokenResult);
-  return idTokenResult;
+
+  validateNonce(oidcState, validatedIdToken);
+
+  return validatedIdToken;
 }

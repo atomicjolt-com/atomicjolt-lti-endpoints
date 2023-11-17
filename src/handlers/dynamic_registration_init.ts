@@ -19,7 +19,7 @@ async function handleDynamicRegistrationInit(
     throw new Error('Invalid Issuer in platform configuration.');
   }
 
-  await handlePlatformConfiguration(platformConfiguration, c.env.PLATFORMS);
+  await handlePlatformConfiguration(c.env, platformConfiguration);
 
   // Generate the UI to present to the user during install
   return c.html(dynamicRegistrationHtml(platformConfiguration, registrationToken));

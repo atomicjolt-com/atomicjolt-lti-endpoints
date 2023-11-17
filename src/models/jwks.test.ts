@@ -1,22 +1,23 @@
 import { expect, it, describe, afterEach } from 'vitest';
 import {
-  getJwks,
+  getCurrentJwks,
   getKeySets,
   rotateKeys,
-  JWKS_KV_KEY,
-} from './jwt';
+  JWKS_KEY,
+} from './jwks';
 import { generateKeySet, keySetsToJwks, verifyJwtUsingJwks, ALGORITHM } from '@atomicjolt/lti-server';
 import { genJwt } from '@atomicjolt/lti-server';
+import { deleteJWKs, getJWKs } from '../models/jwks';
 
 const env = getMiniflareBindings();
 
-describe('jwt', () => {
+describe('jwks', () => {
   afterEach(async () => {
-    await env.JWKS.delete(JWKS_KV_KEY);
+    await deleteJWKs(env, JWKS_KEY);
   });
 
   it('calls getJwks to find a valid jwk', async () => {
-    const jwks = await getJwks(env.JWKS);
+    const jwks = await getCurrentJwks(env);
     expect(jwks?.keys?.[0]?.alg).toEqual(ALGORITHM);
   });
 
@@ -37,22 +38,22 @@ describe('jwt', () => {
   });
 
   it('stores a new public/private key set in KV', async () => {
-    await env.JWKS.delete(JWKS_KV_KEY);
-    const notThere = await env.JWKS.get(JWKS_KV_KEY);
+    await deleteJWKs(env, JWKS_KEY);
+    const notThere = await env.JWKS.get(JWKS_KEY);
     expect(notThere).toEqual(null);
-    await getKeySets(env.JWKS);
-    const there = await env.JWKS.get(JWKS_KV_KEY);
+    await getKeySets(env);
+    const there = await getJWKs(env, JWKS_KEY);
     expect(there?.length).toBeTruthy();
   });
 
   it('rotates the stored jwk keys', async () => {
-    await env.JWKS.delete(JWKS_KV_KEY);
+    await deleteJWKs(env, JWKS_KEY);
 
-    const keySets = await getKeySets(env.JWKS);
+    const keySets = await getKeySets(env);
     expect(keySets.length).toEqual(1);
 
-    await rotateKeys(env.JWKS);
-    const keySets2 = await getKeySets(env.JWKS);
+    await rotateKeys(env);
+    const keySets2 = await getKeySets(env);
     expect(keySets2.length).toEqual(2);
 
     const key1 = keySets[0];
@@ -62,13 +63,13 @@ describe('jwt', () => {
   });
 
   it('rotates removes old jwk keys when rotating', async () => {
-    await env.JWKS.delete(JWKS_KV_KEY);
-    await getKeySets(env.JWKS);
-    await rotateKeys(env.JWKS);
-    await rotateKeys(env.JWKS);
-    await rotateKeys(env.JWKS);
-    await rotateKeys(env.JWKS);
-    const keySets = await getKeySets(env.JWKS);
+    await deleteJWKs(env, JWKS_KEY);
+    await getKeySets(env);
+    await rotateKeys(env);
+    await rotateKeys(env);
+    await rotateKeys(env);
+    await rotateKeys(env);
+    const keySets = await getKeySets(env);
 
     const count = keySets.length;
     expect(count).toEqual(3);

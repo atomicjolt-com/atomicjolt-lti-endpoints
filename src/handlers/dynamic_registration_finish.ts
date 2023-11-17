@@ -11,10 +11,10 @@ export type SecureJsonHeaders = {
 // Finishes the registration process
 export async function handleDynamicRegistrationFinish(
   c: Context,
-  getToolConfiguration: Function,
+  toolConfiguration: ToolConfiguration,
   handlePlatformResponse: Function,
 ): Promise<Response> {
-  const clientRegistrationRequest = getToolConfiguration();
+
   const formData = await c.req.formData();
   const registrationEndpoint = formData.get('registrationEndpoint') as string;
   const registrationToken = formData.get('registrationToken') as string;
@@ -31,35 +31,12 @@ export async function handleDynamicRegistrationFinish(
   const response = await fetch(registrationEndpoint, {
     method: 'POST',
     headers,
-    body: JSON.stringify(clientRegistrationRequest)
+    body: JSON.stringify(toolConfiguration)
   });
   const platformResponse: ToolConfiguration = await response.json()
 
   // Pass the response back to the store so that any required data can be saved  
-  await handlePlatformResponse(platformResponse, c.env.PLATFORMS);
+  await handlePlatformResponse(platformResponse, c.env);
 
   return c.html(dynamicRegistrationFinishHtml());
 }
-
-
-// // Finishes the registration process
-// pub async fn dynamic_registration_finish(
-//   registration_endpoint: & str,
-//   registration_token: & str,
-//   dynamic_registration_store: & dyn DynamicRegistrationStore,
-// ) -> Result < HttpResponse, AtomicToolError > {
-//   let client_registration_request = dynamic_registration_store.get_client_registration_request();
-//   // Send a request to the provider to register the tool
-//   let platform_response = register_tool(
-//     registration_endpoint,
-//     registration_token,
-//     & client_registration_request,
-//   )
-//     .await ?;
-
-//   // Pass the response back to the store so that any required data can be saved
-//   dynamic_registration_store.handle_platform_response(platform_response) ?;
-//   let html = dynamic_registration_store.complete_html();
-//   Ok(HttpResponse:: Ok().content_type("text/html").body(html))
-// }
-

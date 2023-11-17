@@ -1,4 +1,4 @@
 import type { Context } from 'hono';
-import type { IdTokenResult } from '@atomicjolt/lti-server/types';
-export declare function validateRequest(c: Context, state: string, idToken: string): Promise<IdTokenResult>;
+import type { IdToken } from '@atomicjolt/lti-server/types';
+export declare function validateRequest(c: Context, state: string, idToken: string): Promise<IdToken>;
 //# sourceMappingURL=validate.d.ts.map
