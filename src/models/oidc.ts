@@ -13,7 +13,7 @@ export async function setOIDC(env: EnvBindings, oidcState: OIDCState) {
   );
 }
 
-export async function getOIDC(env: EnvBindings, state: string) {
+export async function getOIDC(env: EnvBindings, state: string): Promise<OIDCState> {
   // const id = env.OIDC_STATE.idFromName(state);
   // const obj = env.OIDC_STATE.get(id);
   // const resp = await obj.fetch(c.req.url);

@@ -2,18 +2,23 @@ import { expect, it, describe, afterEach } from 'vitest';
 import {
   getCurrentJwks,
   getKeySets,
-  rotateKeys,
-  JWKS_KEY,
-} from './jwks';
-import { generateKeySet, keySetsToJwks, verifyJwtUsingJwks, ALGORITHM } from '@atomicjolt/lti-server';
-import { genJwt } from '@atomicjolt/lti-server';
-import { deleteJWKs, getJWKs } from '../models/jwks';
+  rotateKeySets,
+} from './key_sets';
+import {
+  generateKeySet,
+  keySetsToJwks,
+  verifyJwtUsingJwks,
+  ALGORITHM,
+  genJwt
+} from '@atomicjolt/lti-server';
+import { destroyKeySets } from '../test/state_helper';
 
 const env = getMiniflareBindings();
 
+
 describe('jwks', () => {
   afterEach(async () => {
-    await deleteJWKs(env, JWKS_KEY);
+    await destroyKeySets(env);
   });
 
   it('calls getJwks to find a valid jwk', async () => {
@@ -38,23 +43,22 @@ describe('jwks', () => {
   });
 
   it('stores a new public/private key set in KV', async () => {
-    await deleteJWKs(env, JWKS_KEY);
-    const notThere = await env.JWKS.get(JWKS_KEY);
-    expect(notThere).toEqual(null);
+    await destroyKeySets(env);
+    const value = await env.KEY_SETS.list();
+    expect(value.keys.length).toEqual(0);
     await getKeySets(env);
-    const there = await getJWKs(env, JWKS_KEY);
-    expect(there?.length).toBeTruthy();
+    expect(value.keys.length).toEqual(1);
   });
 
   it('rotates the stored jwk keys', async () => {
-    await deleteJWKs(env, JWKS_KEY);
+    await destroyKeySets(env);
 
     const keySets = await getKeySets(env);
-    expect(keySets.length).toEqual(1);
+    expect(Object.keys(keySets).length).toEqual(1);
 
-    await rotateKeys(env);
+    await rotateKeySets(env);
     const keySets2 = await getKeySets(env);
-    expect(keySets2.length).toEqual(2);
+    expect(Object.keys(keySets2).length).toEqual(2);
 
     const key1 = keySets[0];
     const key2 = keySets2[0];
@@ -63,15 +67,15 @@ describe('jwks', () => {
   });
 
   it('rotates removes old jwk keys when rotating', async () => {
-    await deleteJWKs(env, JWKS_KEY);
+    await destroyKeySets(env);
     await getKeySets(env);
-    await rotateKeys(env);
-    await rotateKeys(env);
-    await rotateKeys(env);
-    await rotateKeys(env);
+    await rotateKeySets(env);
+    await rotateKeySets(env);
+    await rotateKeySets(env);
+    await rotateKeySets(env);
     const keySets = await getKeySets(env);
 
-    const count = keySets.length;
+    const count = Object.keys(keySets).length;
     expect(count).toEqual(3);
   });
 });

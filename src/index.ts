@@ -5,8 +5,16 @@ export { handleJwks } from './handlers/jwks';
 export { handleDynamicRegistrationInit } from './handlers/dynamic_registration_init';
 export { handleDynamicRegistrationFinish } from './handlers/dynamic_registration_finish';
 export { default as html } from './html/html';
-
-export { getJWKs, setJWKs, deleteJWKs, getCurrentKey, getCurrentPrivateKey, getKeySets, rotateKeys, getCurrentJwks } from './models/jwks';
+export {
+  getKeySet,
+  setKeySet,
+  deleteKeySet,
+  getCurrentKeySet,
+  getCurrentPrivateKey,
+  getKeySets,
+  rotateKeySets,
+  getCurrentJwks,
+} from './models/key_sets';
 export { setOIDC, getOIDC, deleteOIDC } from './models/oidc';
 export { getPlatform, setPlatform, deletePlatform } from './models/platforms';
 export { getRemoteJWKs, setRemoteJWKs, deleteRemoteJWKs } from './models/remote_jwks';

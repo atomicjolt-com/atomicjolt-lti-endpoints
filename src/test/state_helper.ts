@@ -6,7 +6,7 @@ import {
 import type { OIDCState } from '@atomicjolt/lti-server/types';
 import { ALGORITHM, generateKeySet, keySetsToJwks, signJwt } from '@atomicjolt/lti-server';
 import type { EnvBindings } from '../../types';
-import { deleteJWKs, JWKS_KEY } from '../models/jwks';
+import { deleteKeySet, getKeySets } from '../models/key_sets';
 import { setOIDC } from '../models/oidc';
 import { setRemoteJWKs } from '../models/remote_jwks';
 
@@ -19,10 +19,20 @@ export async function storeState(env: EnvBindings, state: string, nonce: string)
   await setOIDC(env, oidcState);
 }
 
+export async function destroyKeySets(env: EnvBindings): Promise<void[]> {
+  const keySetMap = await getKeySets(env);
+  const promises = Object.keys(keySetMap).map(async (kid) => {
+    await deleteKeySet(env, kid);
+  });
+  return Promise.all(promises);
+}
+
+
 export async function setupValidState(env: EnvBindings, token: IdToken): Promise<{ state: string, body: FormData, privateKey: KeyLike }> {
   // Clean out entries
-  await deleteJWKs(env, JWKS_KEY);
-  await deleteJWKs(env, CANVAS_PUBLIC_JWKS_URL);
+  await destroyKeySets(env);
+
+  await deleteKeySet(env, CANVAS_PUBLIC_JWKS_URL);
 
   // Setup jwks for remote
   const keySet = await generateKeySet();

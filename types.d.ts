@@ -9,10 +9,11 @@ import type {
 
 export type EnvBindings = {
   OIDC: KVNamespace;
-  JWKS: KVNamespace;
+  KEY_SETS: KVNamespace;
   REMOTE_JWKS: KVNamespace;
   JWT_KEYS: KVNamespace;
   PLATFORMS: KVNamespace;
+  CLIENT_AUTH_TOKENS: KVNamespace;
   OIDC_STATE: DurableObjectNamespace;
 }
 

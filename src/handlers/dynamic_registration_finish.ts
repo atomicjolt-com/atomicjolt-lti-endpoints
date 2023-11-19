@@ -35,7 +35,7 @@ export async function handleDynamicRegistrationFinish(
     headers,
     body: JSON.stringify(toolConfiguration)
   });
-  const platformResponse: ToolConfiguration = await response.json()
+  const platformResponse: ToolConfiguration = await response.json();
   console.log(platformResponse);
 
   // TODO store client id or deployment id here as needed

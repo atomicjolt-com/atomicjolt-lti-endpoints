@@ -4,9 +4,11 @@ import { HTTPException } from 'hono/http-exception';
 import type { LaunchSettings } from '@atomicjolt/lti-client/types';
 import { IdToken, PlatformConfiguration } from '@atomicjolt/lti-types';
 import type { LTIRequestBody, } from '@atomicjolt/lti-server/types';
-import { getLtiStorageParams } from '@atomicjolt/lti-server';
-import { OPEN_ID_COOKIE_PREFIX } from '@atomicjolt/lti-server';
-import { validateIdTokenContents } from '@atomicjolt/lti-server';
+import {
+  getLtiStorageParams,
+  OPEN_ID_COOKIE_PREFIX,
+  validateIdTokenContents
+} from '@atomicjolt/lti-server';
 import { validateRequest } from '../libs/validate';
 import launchHtml from '../html/launch_html';
 import { getPlatform } from '../models/platforms';
@@ -75,11 +77,14 @@ export async function handleLaunch(c: Context, hashedScriptName: string): Promis
 
   const ltiStorageParams = getLtiStorageParams(platform.authorization_endpoint, target);
 
+  const toolJwt = '';
+
   const settings: LaunchSettings = {
     stateVerified,
     idToken: idToken as IdToken,
     state: body.state,
     ltiStorageParams,
+    jwt: toolJwt,
   };
 
   return c.html(launchHtml(settings, hashedScriptName));

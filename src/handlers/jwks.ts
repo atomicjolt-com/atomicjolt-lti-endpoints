@@ -1,5 +1,5 @@
 import type { Context } from 'hono';
-import { getCurrentJwks } from '../models/jwks';
+import { getCurrentJwks } from '../models/key_sets';
 
 
 export async function handleJwks(c: Context): Promise<Response> {
