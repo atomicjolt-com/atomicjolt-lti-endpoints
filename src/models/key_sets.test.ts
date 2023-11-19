@@ -1,7 +1,9 @@
 import { expect, it, describe, afterEach } from 'vitest';
 import {
   getCurrentJwks,
+  getCurrentKeySet,
   getKeySets,
+  keyToOrdinal,
   rotateKeySets,
 } from './key_sets';
 import {
@@ -28,7 +30,10 @@ describe('jwks', () => {
 
   it('signs using signJwtUsingKey and then decodes using verifyJwtUsingJwks', async () => {
     const { keySet, signed } = await genJwt();
-    const jwks = await keySetsToJwks([keySet]);
+    const keySetMap = {
+      'test:1': keySet,
+    };
+    const jwks = await keySetsToJwks(keySetMap);
     const decodedResult = await verifyJwtUsingJwks(jwks, signed);
     expect(decodedResult.verified).toEqual(true);
   });
@@ -36,18 +41,47 @@ describe('jwks', () => {
   it('fails when the key is incorrect', async () => {
     const { signed } = await genJwt();
     const keySet = await generateKeySet();
-    const jwks = await keySetsToJwks([keySet]);
+    const keySetMap = {
+      'test:1': keySet,
+    };
+    const jwks = await keySetsToJwks(keySetMap);
     const decodedResult = await verifyJwtUsingJwks(jwks, signed);
     expect(decodedResult.verified).toEqual(false);
     expect(decodedResult.error).toEqual('JWSSignatureVerificationFailed: signature verification failed');
   });
 
-  it('stores a new public/private key set in KV', async () => {
+  it('stores a new public/private key set in KV when calling getKeySets if no keysets exist', async () => {
     await destroyKeySets(env);
-    const value = await env.KEY_SETS.list();
+    let value = await env.KEY_SETS.list();
     expect(value.keys.length).toEqual(0);
     await getKeySets(env);
+    value = await env.KEY_SETS.list();
     expect(value.keys.length).toEqual(1);
+  });
+
+  it('returns the current keyset by generating one when none exist', async () => {
+    await destroyKeySets(env);
+    let value = await env.KEY_SETS.list();
+    expect(value.keys.length).toEqual(0);
+    await getCurrentKeySet(env);
+    value = await env.KEY_SETS.list();
+    expect(value.keys.length).toEqual(1);
+  });
+
+  it('returns the latest keyset when calling getCurrentKeySet', async () => {
+    await destroyKeySets(env);
+    let value = await env.KEY_SETS.list();
+    expect(value.keys.length).toEqual(0);
+
+    const keySets = await getKeySets(env);
+    expect(Object.keys(keySets).length).toEqual(1);
+    await rotateKeySets(env);
+    const keySets2 = await getKeySets(env);
+    expect(Object.keys(keySets2).length).toEqual(2);
+
+    const keySetPair = await getCurrentKeySet(env);
+    const ordinal = keyToOrdinal(keySetPair.kid);
+    expect(ordinal).toEqual(2);
   });
 
   it('rotates the stored jwk keys', async () => {

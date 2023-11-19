@@ -10,7 +10,7 @@ import type { KeySet, KeySetMap, KeySetPair } from '@atomicjolt/lti-server/types
 import type { EnvBindings } from '../../types';
 import { ALGORITHM, generateKeySet, keySetsToJwks } from '@atomicjolt/lti-server';
 
-function keyToOrdinal(kid: string): number {
+export function keyToOrdinal(kid: string): number {
   const ordinal = kid.split(':')[1];
   if (ordinal) {
     return parseInt(ordinal, 10);
@@ -20,7 +20,7 @@ function keyToOrdinal(kid: string): number {
 
 // Each key includes a number that is incremented each time a new key is added.
 // Get the max number to determine the next key number.
-async function getMaxKeySetId(env: EnvBindings): Promise<number> {
+export async function getMaxKeySetId(env: EnvBindings): Promise<number> {
   const value = await env.KEY_SETS.list();
   const ordinals = value.keys.map((k) => keyToOrdinal(k.name));
   if (ordinals.length > 0) {
