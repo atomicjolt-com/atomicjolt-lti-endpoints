@@ -36,7 +36,10 @@ export async function setupValidState(env: EnvBindings, token: IdToken): Promise
 
   // Setup jwks for remote
   const keySet = await generateKeySet();
-  const jwks = await keySetsToJwks([keySet]);
+  const keySetMap = {
+    'test:1': keySet,
+  };
+  const jwks = await keySetsToJwks(keySetMap);
   await setRemoteJWKs(env, CANVAS_PUBLIC_JWKS_URL, jwks);
 
   const state = crypto.randomUUID();

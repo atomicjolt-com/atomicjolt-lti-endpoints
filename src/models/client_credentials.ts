@@ -1,16 +1,18 @@
 import type { ClientAuthorizationResponse } from '@atomicjolt/lti-server/types';
 import type { EnvBindings } from '../../types';
 
-export async function setClientCredential(env: EnvBindings, clientId: string, clientAuth: ClientAuthorizationResponse) {
+const oneMin = 60;
+
+export async function setClientCredential(env: EnvBindings, credentialKey: string, clientAuth: ClientAuthorizationResponse) {
   await env.CLIENT_AUTH_TOKENS.put(
-    clientId,
+    credentialKey,
     JSON.stringify(clientAuth),
-    { expirationTtl: clientAuth.expires_in }
+    { expirationTtl: clientAuth.expires_in - oneMin } // Expire the token 1 minute early so we don't use an expired token on accident
   );
 }
 
-export async function getClientCredential(env: EnvBindings, clientId: string): Promise<ClientAuthorizationResponse | null> {
-  const res = await env.CLIENT_AUTH_TOKENS.get(clientId);
+export async function getClientCredential(env: EnvBindings, credentialKey: string): Promise<ClientAuthorizationResponse | null> {
+  const res = await env.CLIENT_AUTH_TOKENS.get(credentialKey);
 
   if (res) {
     return JSON.parse(res) as ClientAuthorizationResponse;

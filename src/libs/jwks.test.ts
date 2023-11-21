@@ -1,23 +1,27 @@
 import { expect, it, describe } from 'vitest';
-import { getIss } from './jwks';
 import { TEST_ID_TOKEN, genJwt } from '@atomicjolt/lti-server';
 
-describe('getIss', function () {
-  it('should return the iss field from a valid JWT', async () => {
-    const token = { ...TEST_ID_TOKEN };
-    const { signed } = await genJwt(token);
-    const jwt = signed;
-    const iss = getIss(jwt);
-    expect(iss).to.equal(token.iss);
-  });
+import { getJwkServer } from './jwks';
+import { setPlatform } from '../models/platforms';
+import { PlatformConfiguration } from '@atomicjolt/lti-types';
 
-  it('should throw an error if the iss field is missing', async () => {
-    const token = { ...TEST_ID_TOKEN };
-    // @ts-expect-error
-    delete token['iss'];
-    const { signed } = await genJwt(token);
-    const jwt = signed;
 
-    expect(() => getIss(jwt)).to.throw('LTI token is missing required field iss.');
+const env = getMiniflareBindings();
+
+describe('getJwkServer', async () => {
+  it('should return the jwks_uri of the platform', async () => {
+    const iss = TEST_ID_TOKEN.iss;
+    const platform: PlatformConfiguration = {
+      issuer: iss,
+      jwks_uri: 'https://example.com/jwks',
+      authorization_endpoint: 'https://example.com/authorize',
+      token_endpoint: 'https://example.com/token',
+    };
+    setPlatform(env, iss, platform);
+
+    const { signed } = await genJwt(TEST_ID_TOKEN);
+    const result = await getJwkServer(env, signed);
+
+    expect(result).toBe(platform.jwks_uri);
   });
 });

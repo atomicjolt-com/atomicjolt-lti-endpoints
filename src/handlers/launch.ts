@@ -14,7 +14,8 @@ import launchHtml from '../html/launch_html';
 import { getPlatform } from '../models/platforms';
 import { deleteOIDC } from '../models/oidc';
 
-export async function handleLaunch(c: Context, hashedScriptName: string): Promise<Response> {
+
+export async function handleLaunch(c: Context, hashedScriptName: string, getToolJwt: Function): Promise<Response> {
   const body = (await c.req.parseBody()) as unknown as LTIRequestBody;
   let idToken: IdToken;
 
@@ -76,15 +77,13 @@ export async function handleLaunch(c: Context, hashedScriptName: string): Promis
   }
 
   const ltiStorageParams = getLtiStorageParams(platform.authorization_endpoint, target);
-
-  const toolJwt = '';
+  const signed = await getToolJwt(c, idToken);
 
   const settings: LaunchSettings = {
     stateVerified,
-    idToken: idToken as IdToken,
     state: body.state,
     ltiStorageParams,
-    jwt: toolJwt,
+    jwt: signed,
   };
 
   return c.html(launchHtml(settings, hashedScriptName));

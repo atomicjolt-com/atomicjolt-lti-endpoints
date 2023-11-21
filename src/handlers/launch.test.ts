@@ -12,7 +12,8 @@ import { deleteOIDC } from '../models/oidc';
 
 const app = new Hono<{ Bindings: EnvBindings }>();
 const initHashedScriptName = 'init.1234.js';
-app.post('/lti/launch', (c) => handleLaunch(c, initHashedScriptName));
+const getToolJwt = () => Promise.resolve('fake_jwt');
+app.post('/lti/launch', (c) => handleLaunch(c, initHashedScriptName, getToolJwt));
 
 const env: EnvBindings = getMiniflareBindings();
 

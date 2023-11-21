@@ -25,3 +25,15 @@ declare global {
     LAUNCH_SETTINGS: LaunchSettings;
   }
 }
+
+export interface NamesAndRolesResponse {
+  result: MembershipContainer;
+  next?: string;
+  differences?: string;
+}
+
+export interface NamesAndRolesParams {
+  role?: string;
+  limit?: string;
+  rlid?: string;
+}

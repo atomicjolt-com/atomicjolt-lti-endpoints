@@ -1,42 +1,12 @@
-import type { ClientCredentials, ClientAuthorizationRequest, ClientAuthorizationResponse } from '@atomicjolt/lti-server/types';
+import type { ClientCredentials, ClientAuthorizationResponse } from '@atomicjolt/lti-server/types';
 import { KeyLike } from 'jose';
-import { signJwt } from '@atomicjolt/lti-server';
+import { ClientCredentialsError, requestServiceToken, signJwt } from '@atomicjolt/lti-server';
 import { EnvBindings } from '../../types';
 import { getClientCredential, setClientCredential } from '../models/client_credentials';
 
 const AUTHORIZATION_TRIES = 3;
 
-class ClientCredentialsError extends Error { }
 
-async function requestServiceToken(platformTokenUrl: string, token: string, scopes: string): Promise<ClientAuthorizationResponse> {
-  const clientAuthorizationRequest: ClientAuthorizationRequest = {
-    grant_type: 'client_credentials',
-    client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-    scope: scopes,
-    client_assertion: token,
-  };
-
-  try {
-    const response = await fetch(platformTokenUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: JSON.stringify(clientAuthorizationRequest),
-    });
-
-    if (response.status !== 200) {
-      const text = await response.text();
-      if (text?.toLowerCase().indexOf('rate limit') >= 0) {
-        throw new ClientCredentialsError('RateLimited');
-      }
-      throw new ClientCredentialsError(`RequestFailed: ${text}`);
-    }
-
-    let clientAuth = await response.json() as ClientAuthorizationResponse;
-    return clientAuth;
-  } catch (error) {
-    throw new ClientCredentialsError(`RequestFailed: ${error}`);
-  }
-}
 
 export async function requestServiceTokenCached(
   env: EnvBindings,
@@ -68,7 +38,7 @@ export async function requestServiceTokenCached(
   while (count < AUTHORIZATION_TRIES) {
     try {
       const clientAuth = await requestServiceToken(platformTokenUrl, token, scopes);
-      await setClientCredential(env, clientId, clientAuth);
+      await setClientCredential(env, clientId + scopes, clientAuth);
       return clientAuth;
     } catch (error) {
       if (error instanceof ClientCredentialsError && error.message === 'RateLimited') {

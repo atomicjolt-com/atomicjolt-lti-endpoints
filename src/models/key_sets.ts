@@ -1,6 +1,5 @@
 import {
   importPKCS8,
-  KeyLike,
   JSONWebKeySet,
   calculateJwkThumbprint,
   importSPKI,
@@ -9,6 +8,7 @@ import {
 import type { KeySet, KeySetMap, KeySetPair } from '@atomicjolt/lti-server/types';
 import type { EnvBindings } from '../../types';
 import { ALGORITHM, generateKeySet, keySetsToJwks } from '@atomicjolt/lti-server';
+import { PrivateKeyPair } from '@atomicjolt/lti-server/types';
 
 export function keyToOrdinal(kid: string): number {
   const ordinal = kid.split(':')[1];
@@ -112,10 +112,13 @@ export async function getCurrentKeySet(env: EnvBindings): Promise<KeySetPair> {
   return await setKeySet(env, await generateKeySet());
 }
 
-export async function getCurrentPrivateKey(env: EnvBindings): Promise<KeyLike> {
+export async function getCurrentPrivateKey(env: EnvBindings): Promise<PrivateKeyPair> {
   const keySetPair = await getCurrentKeySet(env);
-  const pri = await importPKCS8(keySetPair.keySet.privateKey, ALGORITHM);
-  return pri;
+  const privateKey = await importPKCS8(keySetPair.keySet.privateKey, ALGORITHM);
+  return {
+    kid: keySetPair.kid,
+    privateKey,
+  };
 }
 
 export async function rotateKeySets(env: EnvBindings): Promise<KeySetMap> {

@@ -3,22 +3,12 @@ import type { EnvBindings } from '../../types';
 import {
   jwtVerify,
   createLocalJWKSet,
-  decodeJwt,
   JSONWebKeySet,
 } from 'jose';
 import { IdToken } from '@atomicjolt/lti-server/types';
-import { fetchRemoteJwks } from '@atomicjolt/lti-server';
+import { fetchRemoteJwks, getIss } from '@atomicjolt/lti-server';
 import { getRemoteJWKs, setRemoteJWKs } from '../models/remote_jwks';
 import { getPlatform } from '../models/platforms';
-
-export function getIss(jwt: string): string {
-  const decoded = decodeJwt(jwt);
-  const iss = decoded?.iss;
-  if (!iss) {
-    throw new Error('LTI token is missing required field iss.');
-  }
-  return iss;
-}
 
 export async function getJwkServer(env: EnvBindings, jwt: string): Promise<string> {
   const iss = getIss(jwt);

@@ -1,14 +1,9 @@
 import type { Context } from 'hono';
-export type ToolJwt = {
-    client_id: string;
-    deployment_id: string;
-    iss: string;
-    sub: string;
-    exp: number;
-    iat: number;
-    names_and_roles_endpoint_url?: string;
-    platform_iss: string;
-    deep_link_claim_data?: string;
-};
-export declare function verifyToolJwt(c: Context): Promise<ToolJwt>;
+import { EnvBindings } from "../../types";
+import { ToolJwt } from "@atomicjolt/lti-server/types";
+import { DeepLinkingClaim, IdToken } from '@atomicjolt/lti-types';
+export declare function verifyToolJwt<T extends ToolJwt>(c: Context): Promise<T | null>;
+export declare function signToolJwt<T extends ToolJwt>(env: EnvBindings, toolJwt: T, expiresIn?: string): Promise<string>;
+export declare function getBasicToolJwt<T extends ToolJwt>(c: Context, idToken: IdToken): Promise<T>;
+export declare function getDefaultToolJwt<T extends ToolJwt>(clientId: string, deploymentId: string, iss: string, sub: string, platformIss: string, namesAndRolesEndpointUrl: string | undefined, deepLinkClaimData: DeepLinkingClaim | undefined): T;
 //# sourceMappingURL=tool_jwt.d.ts.map
