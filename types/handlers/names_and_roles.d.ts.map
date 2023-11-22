@@ -1,1 +1,1 @@
-{"version":3,"file":"names_and_roles.d.ts","sourceRoot":"","sources":["../../src/handlers/names_and_roles.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,OAAO,EAAE,MAAM,MAAM,CAAC;AAUpC,wBAAsB,mBAAmB,CAAC,CAAC,EAAE,OAAO,GAAG,OAAO,CAAC,QAAQ,CAAC,CA+EvE"}
+{"version":3,"file":"names_and_roles.d.ts","sourceRoot":"","sources":["../../src/handlers/names_and_roles.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,OAAO,EAAE,MAAM,MAAM,CAAC;AASpC,wBAAsB,mBAAmB,CAAC,CAAC,EAAE,OAAO,GAAG,OAAO,CAAC,QAAQ,CAAC,CA+EvE"}
