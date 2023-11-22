@@ -2,7 +2,7 @@ import type { Context } from 'hono';
 import { getCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
 import type { LaunchSettings } from '@atomicjolt/lti-client/types';
-import { IdToken, PlatformConfiguration } from '@atomicjolt/lti-types';
+import { DEEP_LINKING_CLAIM, IdToken, PlatformConfiguration } from '@atomicjolt/lti-types';
 import type { LTIRequestBody, } from '@atomicjolt/lti-server/types';
 import {
   getLtiStorageParams,
@@ -84,6 +84,7 @@ export async function handleLaunch(c: Context, hashedScriptName: string, getTool
     state: body.state,
     ltiStorageParams,
     jwt: signed,
+    deepLinking: idToken[DEEP_LINKING_CLAIM],
   };
 
   return c.html(launchHtml(settings, hashedScriptName));
