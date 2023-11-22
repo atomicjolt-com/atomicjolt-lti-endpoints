@@ -151,14 +151,6 @@ export interface LTIResourceLink {
   submission?: DateTimeRange;
 }
 
-export enum ContentItem {
-  File = 'file',
-  HtmlFragment = 'html',
-  Image = 'image',
-  Link = 'link',
-  LTIResourceLink = 'ltiResourceLink',
-}
-
 export interface DeepLinkPayload {
   iss: string; // client_id
   aud: string; // iss from id token

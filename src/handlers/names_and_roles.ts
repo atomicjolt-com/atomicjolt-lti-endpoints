@@ -7,7 +7,6 @@ import { getPlatform } from '../models/platforms';
 import { parseLinkHeader } from '@atomicjolt/lti-server';
 import { NamesAndRolesParams, NamesAndRolesResponse } from '../../types';
 
-
 export async function handleNamesAndRoles(c: Context): Promise<Response> {
   const jwt = await verifyToolJwt(c);
 

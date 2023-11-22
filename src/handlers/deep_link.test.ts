@@ -1,9 +1,7 @@
 import { Hono } from 'hono';
 import { expect, it, describe } from 'vitest';
-import type {
-  EnvBindings, LTIResourceLink, Image
-} from '../../types';
-import { handleSignDeepLink } from './deep_link';
+import type { EnvBindings, LTIResourceLink, Image } from '../../types';
+import { handleSignDeepLink, ContentItem } from './deep_link';
 import { setFakeToolJwt } from '../test/tool_helper';
 
 const app = new Hono<{ Bindings: EnvBindings }>();
@@ -37,14 +35,14 @@ describe('sign_deep_link', () => {
     const headers = await setFakeToolJwt(env);
 
     const ltiResourceLink: LTIResourceLink = {
-      type: 'ltiResourceLink',
+      type: ContentItem.LTIResourceLink,
       url: 'http://example.com/lti/launch',
       title: 'Hello World',
       text: 'A simple hello world example',
     };
 
     const image: Image = {
-      type: 'image',
+      type: ContentItem.Image,
       url: 'http://example.com/image.png',
     };
 

@@ -1,10 +1,18 @@
 import type { Context } from 'hono';
-import { ContentItem, DeepLinkPayload } from '../../types';
+import { DeepLinkPayload } from '../../types';
 import { verifyToolJwt } from '../libs/tool_jwt';
 import { signJwt } from '@atomicjolt/lti-server';
 import { getCurrentPrivateKey } from '../models/key_sets';
 
 export const deepLinkVersion = '1.3.0';
+
+export enum ContentItem {
+  File = 'file',
+  HtmlFragment = 'html',
+  Image = 'image',
+  Link = 'link',
+  LTIResourceLink = 'ltiResourceLink',
+}
 
 export async function handleSignDeepLink(c: Context): Promise<Response> {
   const jwt = await verifyToolJwt(c);

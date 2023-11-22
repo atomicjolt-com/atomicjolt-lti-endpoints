@@ -34,7 +34,7 @@ global.fetch = vi.fn()
 describe('names_and_roles', () => {
   afterEach(() => {
     vi.restoreAllMocks()
-  })
+  });
 
   it('returns a 200 when the tool jwt is value', async () => {
     const headers = await setFakeToolJwt(env);
