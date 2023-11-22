@@ -5,6 +5,7 @@ export { handleJwks } from './handlers/jwks';
 export { handleDynamicRegistrationInit } from './handlers/dynamic_registration_init';
 export { handleDynamicRegistrationFinish } from './handlers/dynamic_registration_finish';
 export { handleNamesAndRoles } from './handlers/names_and_roles';
+export { handleSignDeepLink } from './handlers/deep_link';
 export { default as html } from './html/html';
 export { getKeySet, setKeySet, deleteKeySet, getCurrentKeySet, getCurrentPrivateKey, getKeySets, rotateKeySets, getCurrentJwks, } from './models/key_sets';
 export { setOIDC, getOIDC, deleteOIDC } from './models/oidc';

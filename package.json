@@ -1,6 +1,6 @@
 {
   "name": "@atomicjolt/lti-endpoints",
-  "version": "1.2.3",
+  "version": "1.3.0",
   "description": "A library of endpoints that can be added to a hono app to handle an LTI launch",
   "main": "dist/index.js",
   "typings": "types/index.d.ts",

@@ -6,8 +6,6 @@ import { getClientCredential, setClientCredential } from '../models/client_crede
 
 const AUTHORIZATION_TRIES = 3;
 
-
-
 export async function requestServiceTokenCached(
   env: EnvBindings,
   clientId: string,
@@ -17,8 +15,10 @@ export async function requestServiceTokenCached(
   rsaPrivateKey: KeyLike
 ): Promise<ClientAuthorizationResponse> {
 
+  const credentialKey = clientId + scopes;
+
   // Try to get a cached token
-  const clientAuth = await getClientCredential(env, clientId);
+  const clientAuth = await getClientCredential(env, credentialKey);
   if (clientAuth) {
     return clientAuth;
   }
@@ -38,7 +38,7 @@ export async function requestServiceTokenCached(
   while (count < AUTHORIZATION_TRIES) {
     try {
       const clientAuth = await requestServiceToken(platformTokenUrl, token, scopes);
-      await setClientCredential(env, clientId + scopes, clientAuth);
+      await setClientCredential(env, credentialKey, clientAuth);
       return clientAuth;
     } catch (error) {
       if (error instanceof ClientCredentialsError && error.message === 'RateLimited') {
