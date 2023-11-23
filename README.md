@@ -5,6 +5,8 @@ This is a collection of Javascript used by Atomic Jolt to assist in handling an 
 
     `npm i @atomicjolt/lti-server`
 
+## Tests
+The tests require access to KV Workers.
 Rename wrangler.toml.example to wrangler.toml and then setup the required kv workers. 
    Setup both production and preview namespaces and the copy the ids into wrangler.toml:
 
