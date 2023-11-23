@@ -5,6 +5,23 @@ This is a collection of Javascript used by Atomic Jolt to assist in handling an 
 
     `npm i @atomicjolt/lti-server`
 
+Rename wrangler.toml.example to wrangler.toml and then setup the required kv workers. 
+   Setup both production and preview namespaces and the copy the ids into wrangler.toml:
+
+  `
+    npx wrangler kv:namespace create OAUTH_STATE
+    npx wrangler kv:namespace create OAUTH_STATE --preview
+    npx wrangler kv:namespace create KEY_SETS
+    npx wrangler kv:namespace create KEY_SETS --preview
+    npx wrangler kv:namespace create REMOTE_JWKS
+    npx wrangler kv:namespace create REMOTE_JWKS --preview
+    npx wrangler kv:namespace create OIDC
+    npx wrangler kv:namespace create OIDC --preview
+    npx wrangler kv:namespace create CLIENT_AUTH_TOKENS
+    npx wrangler kv:namespace create CLIENT_AUTH_TOKENS --preview
+    npx wrangler kv:namespace create PLATFORMS
+    npx wrangler kv:namespace create PLATFORMS --preview
+
 ## Usage
 For an example of how to use this library see https://github.com/atomicjolt/atomic-lti-worker
 
