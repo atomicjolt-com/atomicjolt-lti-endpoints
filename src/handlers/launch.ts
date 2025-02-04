@@ -14,8 +14,7 @@ import launchHtml from '../html/launch_html';
 import { getPlatform } from '../models/platforms';
 import { deleteOIDC } from '../models/oidc';
 
-
-export async function handleLaunch(c: Context, hashedScriptName: string, getToolJwt: Function): Promise<Response> {
+export async function validateLaunchRequest(c: Context, getToolJwt: Function): Promise<LaunchSettings> {
   const body = (await c.req.parseBody()) as unknown as LTIRequestBody;
   let idToken: IdToken;
 
@@ -39,18 +38,14 @@ export async function handleLaunch(c: Context, hashedScriptName: string, getTool
   }
 
   if (!idToken) {
-    return new Response('Missing LTI token.', {
-      status: 401,
-    });
+    throw new HTTPException(401, { message: 'Missing LTI token.' });
   }
 
   const requestedTargetLinkUri = c.req.url;
   const errors = validateIdTokenContents(idToken, requestedTargetLinkUri, true);
   if (errors.length > 0) {
     const message = `Invalid LTI token: ${errors.join(', ')}.`;
-    return new Response(message, {
-      status: 401,
-    });
+    throw new HTTPException(401, { message });
   }
 
   const iss = idToken['iss'];
@@ -58,22 +53,21 @@ export async function handleLaunch(c: Context, hashedScriptName: string, getTool
   try {
     platform = await getPlatform(c.env, iss);
   } catch (e) {
-    return new Response(e as string, {
+    const res = new Response((e as Error).message, {
       status: 401,
     });
+    throw new HTTPException(401, { res });
   }
 
   if (!platform.authorization_endpoint) {
-    return new Response(`Unable to find a platform OIDC URL matching for iss: ${iss} `, {
-      status: 401,
-    });
+    const message = `Unable to find a platform OIDC URL matching for iss: ${iss} `;
+    throw new HTTPException(401, { message });
   };
 
   const target = body.lti_storage_target;
   if (!target && !stateVerified) {
-    return new Response('Unable to securely launch tool. Please ensure cookies are enabled', {
-      status: 401,
-    });
+    const message = 'Unable to securely launch tool. Please ensure cookies are enabled';
+    throw new HTTPException(401, { message });
   }
 
   const ltiStorageParams = getLtiStorageParams(platform.authorization_endpoint, target);
@@ -87,5 +81,10 @@ export async function handleLaunch(c: Context, hashedScriptName: string, getTool
     deepLinking: idToken[DEEP_LINKING_CLAIM],
   };
 
+  return settings;
+}
+
+export async function handleLaunch(c: Context, hashedScriptName: string, getToolJwt: Function): Promise<Response> {
+  const settings = await validateLaunchRequest(c, getToolJwt);
   return c.html(launchHtml(settings, hashedScriptName));
 }
