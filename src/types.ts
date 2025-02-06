@@ -1,11 +1,11 @@
 import 'vite/client';
 import { KVNamespace, DurableObjectNamespace } from '@cloudflare/workers-types';
-import type { IdToken } from '@atomicjolt/lti-types';
 import type {
-  LTIStorageParams,
   InitSettings,
   LaunchSettings,
 } from '@atomicjolt/lti-client/types';
+import { MembershipContainer } from '@atomicjolt/lti-types';
+import { ContentItem } from './handlers/deep_link';
 
 export type EnvBindings = {
   OIDC: KVNamespace;

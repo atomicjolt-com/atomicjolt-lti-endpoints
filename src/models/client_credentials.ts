@@ -1,5 +1,5 @@
-import type { ClientAuthorizationResponse } from '@atomicjolt/lti-server/types';
-import type { EnvBindings } from '../../types';
+import type { ClientAuthorizationResponse } from '@atomicjolt/lti-server';
+import type { EnvBindings } from '../types';
 
 const oneMin = 60;
 

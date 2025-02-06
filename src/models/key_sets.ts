@@ -5,10 +5,10 @@ import {
   importSPKI,
   exportJWK,
 } from 'jose';
-import type { KeySet, KeySetMap, KeySetPair } from '@atomicjolt/lti-server/types';
-import type { EnvBindings } from '../../types';
+import type { KeySet, KeySetMap, KeySetPair } from '@atomicjolt/lti-server';
+import type { EnvBindings } from '../types';
 import { ALGORITHM, generateKeySet, keySetsToJwks } from '@atomicjolt/lti-server';
-import { PrivateKeyPair } from '@atomicjolt/lti-server/types';
+import { PrivateKeyPair } from '@atomicjolt/lti-server';
 
 export function keyToOrdinal(kid: string): number {
   const ordinal = kid.split(':')[1];

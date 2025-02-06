@@ -6,7 +6,7 @@ import {
   CANVAS_BETA_AUTH_TOKEN_URL,
   CANVAS_BETA_OIDC_URL,
 } from '@atomicjolt/lti-types';
-import type { PlatformConfigurations } from '@atomicjolt/lti-server/types';
+import type { PlatformConfigurations } from '@atomicjolt/lti-server';
 
 export const KNOWN_PLATFORMS: PlatformConfigurations = {
   'https://canvas.instructure.com': {

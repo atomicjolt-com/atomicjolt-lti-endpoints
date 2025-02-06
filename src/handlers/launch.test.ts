@@ -5,7 +5,7 @@ import {
   MESSAGE_TYPE,
 } from '@atomicjolt/lti-types';
 import { OPEN_ID_COOKIE_PREFIX, signJwt, TEST_ID_TOKEN, genJwt } from '@atomicjolt/lti-server';
-import type { EnvBindings } from '../../types';
+import type { EnvBindings } from '../types';
 import { setupValidState, storeState } from '../test/state_helper';
 import { handleLaunch } from './launch';
 import { deleteOIDC } from '../models/oidc';

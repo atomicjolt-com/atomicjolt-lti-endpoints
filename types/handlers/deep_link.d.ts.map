@@ -1,1 +1,0 @@
-{"version":3,"file":"deep_link.d.ts","sourceRoot":"","sources":["../../src/handlers/deep_link.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,OAAO,EAAE,MAAM,MAAM,CAAC;AAMpC,eAAO,MAAM,eAAe,UAAU,CAAC;AAEvC,oBAAY,WAAW;IACrB,IAAI,SAAS;IACb,YAAY,SAAS;IACrB,KAAK,UAAU;IACf,IAAI,SAAS;IACb,eAAe,oBAAoB;CACpC;AAED,wBAAsB,kBAAkB,CAAC,CAAC,EAAE,OAAO,GAAG,OAAO,CAAC,QAAQ,CAAC,CA+BtE"}

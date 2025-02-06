@@ -1,6 +1,7 @@
+export * from './types';
 export { handleInit } from './handlers/init';
 export { handleRedirect } from './handlers/redirect';
-export { handleLaunch } from './handlers/launch';
+export { handleLaunch, validateLaunchRequest } from './handlers/launch';
 export { handleJwks } from './handlers/jwks';
 export { handleDynamicRegistrationInit } from './handlers/dynamic_registration_init';
 export { handleDynamicRegistrationFinish } from './handlers/dynamic_registration_finish';

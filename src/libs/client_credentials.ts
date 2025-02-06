@@ -1,7 +1,7 @@
-import type { ClientCredentials, ClientAuthorizationResponse } from '@atomicjolt/lti-server/types';
+import type { ClientCredentials, ClientAuthorizationResponse } from '@atomicjolt/lti-server';
 import { KeyLike } from 'jose';
 import { ClientCredentialsError, requestServiceToken, signJwt } from '@atomicjolt/lti-server';
-import { EnvBindings } from '../../types';
+import { EnvBindings } from '../types';
 import { getClientCredential, setClientCredential } from '../models/client_credentials';
 
 const AUTHORIZATION_TRIES = 3;

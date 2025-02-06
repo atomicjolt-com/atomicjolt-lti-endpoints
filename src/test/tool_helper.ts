@@ -1,8 +1,8 @@
 import { getDefaultToolJwt, signToolJwt } from '../libs/tool_jwt';
 import { DeepLinkingClaim, NAMES_AND_ROLES_SCOPE } from '@atomicjolt/lti-types';
-import { ClientAuthorizationResponse } from '@atomicjolt/lti-server/types';
+import { ClientAuthorizationResponse } from '@atomicjolt/lti-server';
 import { setClientCredential } from '../models/client_credentials';
-import { EnvBindings } from '../../types';
+import { EnvBindings } from '../types';
 
 export async function setFakeToolJwt(env: EnvBindings) {
   const clientId = '1234';

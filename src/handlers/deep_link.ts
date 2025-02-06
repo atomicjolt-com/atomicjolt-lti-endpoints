@@ -1,5 +1,5 @@
 import type { Context } from 'hono';
-import { DeepLinkPayload } from '../../types';
+import { DeepLinkPayload } from '../types';
 import { verifyToolJwt } from '../libs/tool_jwt';
 import { signJwt } from '@atomicjolt/lti-server';
 import { getCurrentPrivateKey } from '../models/key_sets';
@@ -36,7 +36,7 @@ export async function handleSignDeepLink(c: Context): Promise<Response> {
     'https://purl.imsglobal.org/spec/lti/claim/version': deepLinkVersion,
     'https://purl.imsglobal.org/spec/lti/claim/deployment_id': jwt.deploymentId,
     'https://purl.imsglobal.org/spec/lti-dl/claim/content_items': contentItems,
-    'https://purl.imsglobal.org/spec/lti-dl/claim/data': jwt.deepLinkClaimData.data,
+    'https://purl.imsglobal.org/spec/lti-dl/claim/data': jwt?.deepLinkClaimData?.data,
   };
 
   const privateKeyPair = await getCurrentPrivateKey(c.env);

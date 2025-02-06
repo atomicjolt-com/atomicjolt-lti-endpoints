@@ -1,4 +1,4 @@
-import type { EnvBindings } from '../../types';
+import type { EnvBindings } from '../types';
 import { JSONWebKeySet } from 'jose';
 
 

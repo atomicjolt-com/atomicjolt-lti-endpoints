@@ -3,9 +3,9 @@ import {
   CANVAS_PUBLIC_JWKS_URL,
   IdToken,
 } from '@atomicjolt/lti-types';
-import type { OIDCState } from '@atomicjolt/lti-server/types';
+import type { OIDCState } from '@atomicjolt/lti-server';
 import { ALGORITHM, generateKeySet, keySetsToJwks, signJwt } from '@atomicjolt/lti-server';
-import type { EnvBindings } from '../../types';
+import type { EnvBindings } from '../types';
 import { deleteKeySet, getKeySets } from '../models/key_sets';
 import { setOIDC } from '../models/oidc';
 import { setRemoteJWKs } from '../models/remote_jwks';

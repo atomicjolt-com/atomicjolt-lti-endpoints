@@ -6,7 +6,7 @@ import { getPlatform } from '../models/platforms';
 import initHtml from '../html/init_html';
 import { setOIDC } from '../models/oidc';
 import { PlatformConfiguration } from '@atomicjolt/lti-types';
-import { LTIInitBody } from '@atomicjolt/lti-server/types';
+import { LTIInitBody } from '@atomicjolt/lti-server';
 
 function writeCookie(c: Context, name: string, value: string, maxAge: number) {
   setCookie(c, name, value, {

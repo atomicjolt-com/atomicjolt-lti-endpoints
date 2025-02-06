@@ -1,1 +1,0 @@
-{"version":3,"file":"platforms.d.ts","sourceRoot":"","sources":["../../src/libs/platforms.ts"],"names":[],"mappings":"AAUA,OAAO,KAAK,EAAE,SAAS,EAAE,MAAM,8BAA8B,CAAC;AAK9D,eAAO,MAAM,SAAS,EAAE,SAgCvB,CAAC;AAGF,wBAAsB,YAAY,CAAC,GAAG,EAAE,MAAM,GAAG,OAAO,CAAC,MAAM,CAAC,CAW/D;AAED,wBAAgB,kBAAkB,CAAC,GAAG,EAAE,MAAM,GAAG,MAAM,CAOtD"}

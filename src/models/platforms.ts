@@ -1,9 +1,9 @@
-import type { EnvBindings } from '../../types';
+import type { EnvBindings } from '../types';
 import type { PlatformConfiguration } from '@atomicjolt/lti-types';
 import { KNOWN_PLATFORMS } from '../libs/known_platforms';
 
 export async function getPlatform(env: EnvBindings, iss: string): Promise<PlatformConfiguration> {
-  let config: PlatformConfiguration;
+  let config: PlatformConfiguration | undefined;
   const record = await env.PLATFORMS.get(iss);
   if (record) {
     config = JSON.parse(record) as PlatformConfiguration;

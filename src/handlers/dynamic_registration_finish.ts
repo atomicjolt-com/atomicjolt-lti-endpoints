@@ -12,6 +12,8 @@ export type SecureJsonHeaders = {
 export async function handleDynamicRegistrationFinish(
   c: Context,
   getToolConfiguration: Function,
+  handlePlatformResponse: Function | null = null,
+  renderFinishHtml: Function | null = null,
 ): Promise<Response> {
 
   const formData = await c.req.formData();
@@ -38,9 +40,12 @@ export async function handleDynamicRegistrationFinish(
   const platformResponse: ToolConfiguration = await response.json();
   console.log(platformResponse);
 
-  // TODO store client id or deployment id here as needed
-  // platformResponse.client_id
-  // platformResponse['https://purl.imsglobal.org/spec/lti-tool-configuration'].deployment_id
+  if (handlePlatformResponse) {
+    return handlePlatformResponse(platformResponse);
+  }
 
+  if (renderFinishHtml) {
+    return c.html(renderFinishHtml(platformResponse));
+  }
   return c.html(dynamicRegistrationFinishHtml());
 }

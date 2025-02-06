@@ -2,8 +2,8 @@ import { importPKCS8, importSPKI } from "jose";
 import type { Context } from 'hono';
 import { ALGORITHM, getKid, signJwt, verifyJwt } from "@atomicjolt/lti-server";
 import { getCurrentKeySet, getKeySet } from "../models/key_sets";
-import { EnvBindings } from "../../types";
-import { ToolJwt } from "@atomicjolt/lti-server/types";
+import { EnvBindings } from "../types";
+import { ToolJwt } from "@atomicjolt/lti-server";
 import { DEEP_LINKING_CLAIM, DEPLOYMENT_ID, DeepLinkingClaim, IdToken, NAMES_AND_ROLES_CLAIM, } from '@atomicjolt/lti-types';
 import { clientId } from '@atomicjolt/lti-client';
 

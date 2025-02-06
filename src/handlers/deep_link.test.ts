@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { expect, it, describe } from 'vitest';
-import type { EnvBindings, LTIResourceLink, Image } from '../../types';
+import type { EnvBindings, LTIResourceLink, Image } from '../types';
 import { handleSignDeepLink, ContentItem } from './deep_link';
 import { setFakeToolJwt } from '../test/tool_helper';
 

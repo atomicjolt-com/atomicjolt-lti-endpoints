@@ -1,5 +1,5 @@
 import type { Context } from 'hono';
-import type { IdToken } from '@atomicjolt/lti-server/types';
+import type { IdToken } from '@atomicjolt/lti-server';
 import { validateNonce } from '@atomicjolt/lti-server';
 import { getOIDC } from '../models/oidc';
 import { validateIdToken } from './jwks';

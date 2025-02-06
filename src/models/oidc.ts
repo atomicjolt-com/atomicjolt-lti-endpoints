@@ -1,6 +1,6 @@
-import type { OIDCState } from '@atomicjolt/lti-server/types';
+import type { OIDCState } from '@atomicjolt/lti-server';
 import { ALLOWED_LAUNCH_TIME } from '@atomicjolt/lti-server';
-import type { EnvBindings } from '../../types';
+import type { EnvBindings } from '../types';
 
 export async function setOIDC(env: EnvBindings, oidcState: OIDCState) {
   // const id = env.OIDC_STATE.idFromName(oidcState.state);

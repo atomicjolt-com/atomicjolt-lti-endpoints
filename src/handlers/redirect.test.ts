@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { expect, it, describe } from 'vitest';
 import { OPEN_ID_STORAGE_COOKIE } from '@atomicjolt/lti-server';
-import type { EnvBindings } from '../../types';
+import type { EnvBindings } from '../types';
 import { setupValidState } from '../test/state_helper';
 import { TEST_ID_TOKEN } from '@atomicjolt/lti-server';
 import { handleRedirect } from './redirect';

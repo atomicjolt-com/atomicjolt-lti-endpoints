@@ -1,11 +1,11 @@
-import type { JwtValidationResult } from '@atomicjolt/lti-server/types';
-import type { EnvBindings } from '../../types';
+import type { JwtValidationResult } from '@atomicjolt/lti-server';
+import type { EnvBindings } from '../types';
 import {
   jwtVerify,
   createLocalJWKSet,
   JSONWebKeySet,
 } from 'jose';
-import { IdToken } from '@atomicjolt/lti-server/types';
+import { IdToken } from '@atomicjolt/lti-server';
 import { fetchRemoteJwks, getIss } from '@atomicjolt/lti-server';
 import { getRemoteJWKs, setRemoteJWKs } from '../models/remote_jwks';
 import { getPlatform } from '../models/platforms';

@@ -1,4 +1,4 @@
-import type { RedirectParams } from '@atomicjolt/lti-server/types';
+import type { RedirectParams } from '@atomicjolt/lti-server';
 import html from './html';
 
 export default function redirectHtml(redirectParams: RedirectParams, targetLinkUri: string) {

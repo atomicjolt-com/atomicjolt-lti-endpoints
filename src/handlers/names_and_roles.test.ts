@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { expect, it, describe, vi, afterEach } from 'vitest';
-import type { EnvBindings } from '../../types';
+import type { EnvBindings } from '../types';
 import { handleNamesAndRoles } from './names_and_roles';
 import { setFakeToolJwt } from '../test/tool_helper';
 

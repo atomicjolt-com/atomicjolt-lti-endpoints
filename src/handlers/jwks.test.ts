@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { expect, it, describe } from 'vitest';
-import type { jwksResult } from '@atomicjolt/lti-server/types';
-import type { EnvBindings } from '../../types';
+import type { jwksResult } from '@atomicjolt/lti-server';
+import type { EnvBindings } from '../types';
 import { handleJwks } from './jwks';
 
 const env = getMiniflareBindings();
