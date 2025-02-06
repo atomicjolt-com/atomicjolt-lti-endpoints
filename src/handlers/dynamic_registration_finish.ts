@@ -1,5 +1,5 @@
 import type { Context } from 'hono';
-import type { ToolConfiguration } from '@atomicjolt/lti-types';
+import type { PlatformConfiguration, ToolConfiguration } from '@atomicjolt/lti-types';
 import dynamicRegistrationFinishHtml from "../html/dynamic_registration_finish_html";
 
 export type SecureJsonHeaders = {
@@ -8,17 +8,26 @@ export type SecureJsonHeaders = {
   AUTHORIZATION?: string
 };
 
+export type GetToolConfiguration = (platformConfig: PlatformConfiguration, host: string) => ToolConfiguration;
+export type HandlePlatformResponse = (platformResponse: ToolConfiguration) => null;
+export type RenderFinishHtml = (platformResponse: ToolConfiguration) => string;
+
 // Finishes the registration process
 export async function handleDynamicRegistrationFinish(
   c: Context,
-  getToolConfiguration: Function,
-  handlePlatformResponse: Function | null = null,
-  renderFinishHtml: Function | null = null,
+  getToolConfiguration: GetToolConfiguration,
+  handlePlatformResponse: HandlePlatformResponse | null = null,
+  renderFinishHtml: RenderFinishHtml | null = null,
 ): Promise<Response> {
 
   const formData = await c.req.formData();
-  const registrationEndpoint = formData.get('registrationEndpoint') as string;
+  const platformConfiguration = JSON.parse(formData.get('platformConfiguration') as string) as PlatformConfiguration;
+  const registrationEndpoint = platformConfiguration.registration_endpoint;
   const registrationToken = formData.get('registrationToken') as string;
+
+  if (!registrationEndpoint) {
+    throw new Error('registration_endpoint not found in platform configuration');
+  }
 
   // Send a request to the provider to register the tool
   const headers: SecureJsonHeaders = {
@@ -31,17 +40,16 @@ export async function handleDynamicRegistrationFinish(
   }
 
   const host = (new URL(c.req.url)).host;
-  const toolConfiguration = getToolConfiguration(host);
+  const toolConfiguration = getToolConfiguration(platformConfiguration, host);
   const response = await fetch(registrationEndpoint, {
     method: 'POST',
     headers,
     body: JSON.stringify(toolConfiguration)
   });
   const platformResponse: ToolConfiguration = await response.json();
-  console.log(platformResponse);
 
   if (handlePlatformResponse) {
-    return handlePlatformResponse(platformResponse);
+    handlePlatformResponse(platformResponse);
   }
 
   if (renderFinishHtml) {
