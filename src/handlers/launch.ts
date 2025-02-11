@@ -84,7 +84,9 @@ export async function validateLaunchRequest(c: Context, getToolJwt: Function): P
   return settings;
 }
 
-export async function handleLaunch(c: Context, hashedScriptName: string, getToolJwt: Function): Promise<Response> {
+export type GetToolJwt = (c: Context, idToken: IdToken) => Promise<string>;
+
+export async function handleLaunch(c: Context, hashedScriptName: string, getToolJwt: GetToolJwt): Promise<Response> {
   const settings = await validateLaunchRequest(c, getToolJwt);
   return c.html(launchHtml(settings, hashedScriptName));
 }

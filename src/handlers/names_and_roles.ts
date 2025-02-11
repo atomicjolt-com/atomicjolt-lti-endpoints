@@ -4,8 +4,8 @@ import { verifyToolJwt } from '../libs/tool_jwt';
 import { requestServiceTokenCached } from '../libs/client_credentials';
 import { getCurrentPrivateKey } from '../models/key_sets';
 import { getPlatform } from '../models/platforms';
-import { parseLinkHeader } from '@atomicjolt/lti-server';
 import { NamesAndRolesParams, NamesAndRolesResponse } from '../types';
+import { parseLinkHeader } from '@atomicjolt/lti-server';
 
 export async function handleNamesAndRoles(c: Context): Promise<Response> {
   const jwt = await verifyToolJwt(c);

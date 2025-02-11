@@ -2,9 +2,11 @@ import type { Context } from 'hono';
 import type { PlatformConfiguration } from '@atomicjolt/lti-types';
 import { setPlatform } from '../models/platforms';
 
+export type DynamicRegistrationHtml = (platformConfiguration: PlatformConfiguration, registrationToken: string) => string;
+
 async function handleDynamicRegistrationInit(
   c: Context,
-  dynamicRegistrationHtml: Function
+  dynamicRegistrationHtml: DynamicRegistrationHtml
 ): Promise<Response> {
   // Get the registration token and openid configuration URL from the query string
   const registrationToken = c.req.query('registration_token') as string;

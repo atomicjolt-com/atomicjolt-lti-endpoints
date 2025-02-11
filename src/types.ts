@@ -1,4 +1,3 @@
-import 'vite/client';
 import { KVNamespace, DurableObjectNamespace } from '@cloudflare/workers-types';
 import type {
   InitSettings,

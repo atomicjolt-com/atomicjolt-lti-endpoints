@@ -9,7 +9,7 @@ export type SecureJsonHeaders = {
 };
 
 export type GetToolConfiguration = (platformConfig: PlatformConfiguration, host: string) => ToolConfiguration;
-export type HandlePlatformResponse = (platformResponse: ToolConfiguration) => null;
+export type HandlePlatformResponse = (platformResponse: ToolConfiguration) => void;
 export type RenderFinishHtml = (platformResponse: ToolConfiguration) => string;
 
 // Finishes the registration process
@@ -21,7 +21,8 @@ export async function handleDynamicRegistrationFinish(
 ): Promise<Response> {
 
   const formData = await c.req.formData();
-  const platformConfiguration = JSON.parse(formData.get('platformConfiguration') as string) as PlatformConfiguration;
+  const rawPlatformConfiguration = formData.get('platformConfiguration') as string;
+  const platformConfiguration = JSON.parse(decodeURIComponent(rawPlatformConfiguration)) as PlatformConfiguration;
   const registrationEndpoint = platformConfiguration.registration_endpoint;
   const registrationToken = formData.get('registrationToken') as string;
 
