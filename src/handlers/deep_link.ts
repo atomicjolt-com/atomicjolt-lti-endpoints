@@ -3,16 +3,26 @@ import { DeepLinkPayload } from '../types';
 import { verifyToolJwt } from '../libs/tool_jwt';
 import { signJwt } from '@atomicjolt/lti-server';
 import { getCurrentPrivateKey } from '../models/key_sets';
+import {
+  AcceptTypes,
+  CONTENT_ITEM_CLAIM,
+  DEEP_LINKING_DATA_CLAIM,
+  DEPLOYMENT_ID,
+  LTI_VERSION,
+  LtiVersions,
+  MESSAGE_TYPE,
+  MessageTypes
+} from '@atomicjolt/lti-types';
 
-export const deepLinkVersion = '1.3.0';
+export const deepLinkVersion = LtiVersions.v1_3_0;
 
-export enum ContentItem {
-  File = 'file',
-  HtmlFragment = 'html',
-  Image = 'image',
-  Link = 'link',
-  LTIResourceLink = 'ltiResourceLink',
-}
+export const ContentItem = {
+  HTML: 'html',
+  LTIResourceLink: 'ltiResourceLink',
+  Link: 'link',
+  Image: 'image',
+} as const;
+export type ContentItem = keyof typeof AcceptTypes;
 
 export async function handleSignDeepLink(c: Context): Promise<Response> {
   const jwt = await verifyToolJwt(c);
@@ -32,11 +42,11 @@ export async function handleSignDeepLink(c: Context): Promise<Response> {
     exp: (Date.now() / 1000) + (60 * 60), // 1 hour from now
     iat: Date.now() / 1000,
     nonce,
-    'https://purl.imsglobal.org/spec/lti/claim/message_type': 'LtiDeepLinkingRequest',
-    'https://purl.imsglobal.org/spec/lti/claim/version': deepLinkVersion,
-    'https://purl.imsglobal.org/spec/lti/claim/deployment_id': jwt.deploymentId,
-    'https://purl.imsglobal.org/spec/lti-dl/claim/content_items': contentItems,
-    'https://purl.imsglobal.org/spec/lti-dl/claim/data': jwt?.deepLinkClaimData?.data,
+    [MESSAGE_TYPE]: MessageTypes.LtiDeepLinkingRequest,
+    [LTI_VERSION]: deepLinkVersion,
+    [DEPLOYMENT_ID]: jwt.deploymentId,
+    [CONTENT_ITEM_CLAIM]: contentItems,
+    [DEEP_LINKING_DATA_CLAIM]: jwt?.deepLinkClaimData?.data,
   };
 
   const privateKeyPair = await getCurrentPrivateKey(c.env);
