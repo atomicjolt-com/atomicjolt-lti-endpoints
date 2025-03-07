@@ -3,8 +3,7 @@ import { signToolJwt, verifyToolJwt } from './tool_jwt';
 import { destroyKeySets } from '../test/state_helper';
 import { getKeySets } from '../models/key_sets';
 import { getDefaultToolJwt } from './tool_jwt';
-
-const env = getMiniflareBindings();
+import { env } from "cloudflare:test";
 
 describe('verifyToolJwt', () => {
   afterEach(async () => {

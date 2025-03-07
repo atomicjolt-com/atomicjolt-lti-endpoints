@@ -27,7 +27,6 @@ export async function destroyKeySets(env: EnvBindings): Promise<void[]> {
   return Promise.all(promises);
 }
 
-
 export async function setupValidState(env: EnvBindings, token: IdToken): Promise<{ state: string, body: FormData, privateKey: KeyLike }> {
   // Clean out entries
   await destroyKeySets(env);

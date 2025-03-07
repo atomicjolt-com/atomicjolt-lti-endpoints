@@ -3,9 +3,9 @@ import { expect, it, describe } from 'vitest';
 import type { EnvBindings, LTIResourceLink, Image } from '../types';
 import { handleSignDeepLink, ContentItem } from './deep_link';
 import { setFakeToolJwt } from '../test/tool_helper';
+import { env } from "cloudflare:test";
 
 const app = new Hono<{ Bindings: EnvBindings }>();
-const env: EnvBindings = getMiniflareBindings();
 
 app.post('/lti/sign_deep_link', (c) => handleSignDeepLink(c));
 

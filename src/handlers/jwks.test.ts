@@ -3,8 +3,8 @@ import { expect, it, describe } from 'vitest';
 import type { jwksResult } from '@atomicjolt/lti-server';
 import type { EnvBindings } from '../types';
 import { handleJwks } from './jwks';
+import { env } from "cloudflare:test";
 
-const env = getMiniflareBindings();
 const app = new Hono<{ Bindings: EnvBindings }>();
 app.get('/lti/jwks', handleJwks);
 

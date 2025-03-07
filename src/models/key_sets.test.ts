@@ -14,9 +14,7 @@ import {
   genJwt
 } from '@atomicjolt/lti-server';
 import { destroyKeySets } from '../test/state_helper';
-
-const env = getMiniflareBindings();
-
+import { env } from "cloudflare:test";
 
 describe('jwks', () => {
   afterEach(async () => {

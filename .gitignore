@@ -31,4 +31,3 @@ dist-ssr
 /.wrangler
 
 public/dist
-wrangler.toml

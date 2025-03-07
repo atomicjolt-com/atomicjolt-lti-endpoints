@@ -12,7 +12,11 @@
     "preserveConstEnums": true,
     "moduleResolution": "node",
     "sourceMap": true,
-    "types": ["node"],
+    "types": [
+      "node",
+      "@cloudflare/workers-types",
+      "@cloudflare/vitest-pool-workers"
+    ],
     "resolveJsonModule": true,
     "allowJs": true,
     "checkJs": false,

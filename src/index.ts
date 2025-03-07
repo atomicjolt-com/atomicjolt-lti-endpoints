@@ -22,3 +22,4 @@ export { setOIDC, getOIDC, deleteOIDC } from './models/oidc';
 export { getPlatform, setPlatform, deletePlatform } from './models/platforms';
 export { getRemoteJWKs, setRemoteJWKs, deleteRemoteJWKs } from './models/remote_jwks';
 export { verifyToolJwt, signToolJwt, getBasicToolJwt, getDefaultToolJwt } from './libs/tool_jwt';
+export { OIDCStateDurableObject } from './durable/oidc_state';

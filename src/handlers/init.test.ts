@@ -3,8 +3,8 @@ import { expect, it, describe } from 'vitest';
 import { OPEN_ID_COOKIE_PREFIX, OPEN_ID_STORAGE_COOKIE } from '@atomicjolt/lti-server';
 import type { EnvBindings } from '../types';
 import { handleInit } from './init';
+import { env } from "cloudflare:test";
 
-const env = getMiniflareBindings();
 const app = new Hono<{ Bindings: EnvBindings }>();
 const initHashedScriptName = 'init.1234.js';
 app.post('/lti/init', (c) => handleInit(c, initHashedScriptName));

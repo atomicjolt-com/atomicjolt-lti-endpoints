@@ -5,8 +5,8 @@ import type { EnvBindings } from '../types';
 import { setupValidState } from '../test/state_helper';
 import { TEST_ID_TOKEN } from '@atomicjolt/lti-server';
 import { handleRedirect } from './redirect';
+import { env } from "cloudflare:test";
 
-const env: EnvBindings = getMiniflareBindings();
 const app = new Hono<{ Bindings: EnvBindings }>();
 
 app.post('/lti/redirect', (c) => handleRedirect(c));

@@ -1,53 +1,52 @@
 # AtomicJolt LTI
+
 This is a collection of Javascript used by Atomic Jolt to assist in handling an LTI launch on the server.
 
 ## Installation
 
-    `npm i @atomicjolt/lti-server`
+`npm i @atomicjolt/lti-server`
 
 ## Tests
-The tests require access to KV Workers.
-Rename wrangler.toml.example to wrangler.toml and then setup the required kv workers. 
-   Setup both production and preview namespaces and the copy the ids into wrangler.toml:
 
-  `
-    npx wrangler kv:namespace create OAUTH_STATE
-    npx wrangler kv:namespace create OAUTH_STATE --preview
-    npx wrangler kv:namespace create KEY_SETS
-    npx wrangler kv:namespace create KEY_SETS --preview
-    npx wrangler kv:namespace create REMOTE_JWKS
-    npx wrangler kv:namespace create REMOTE_JWKS --preview
-    npx wrangler kv:namespace create OIDC
-    npx wrangler kv:namespace create OIDC --preview
-    npx wrangler kv:namespace create CLIENT_AUTH_TOKENS
-    npx wrangler kv:namespace create CLIENT_AUTH_TOKENS --preview
-    npx wrangler kv:namespace create PLATFORMS
-    npx wrangler kv:namespace create PLATFORMS --preview
+`npm run test`
 
 ## Usage
+
 For an example of how to use this library see https://github.com/atomicjolt/atomic-lti-worker
 
 The application code using this library must implement the LTI Launch in 3 phases, providing the server side code for each phase and returning and html response for each phase. Phases 1 and 3 will include a call to the client side javacript contained in this library. See the 1Edtech working group documentation for more information about the LTI standard: https://www.imsglobal.org/activity/learning-tools-interoperability.
 
 1. Open ID Connect initialization
-During this phase respond to the OIDC initialization request, attempt to write a state cookie and return and html page with a call to `initOIDCLaunch` from 
-@atomicjolt/lti-client
+   During this phase respond to the OIDC initialization request, attempt to write a state cookie and return and html page with a call to `initOIDCLaunch` from
+   @atomicjolt/lti-client
 
 2. Redirect
-Server side validate the redirect and then return an HTML page capable of redirecting to the final LTI launch
+   Server side validate the redirect and then return an HTML page capable of redirecting to the final LTI launch
 
 3. Handle the LTI launch.
-Validate the request including checking the nonce server side. Check for a valid state cookie and then return an HTML page with a script that calls `ltiLaunch` from @atomicjolt/lti-client.
+   Validate the request including checking the nonce server side. Check for a valid state cookie and then return an HTML page with a script that calls `ltiLaunch` from @atomicjolt/lti-client.
+
+The application will require KV namespaces. Set them up as follows
+`npx wrangler kv:namespace create KEY_SETS
+npx wrangler kv:namespace create KEY_SETS --preview
+npx wrangler kv:namespace create REMOTE_JWKS
+npx wrangler kv:namespace create REMOTE_JWKS --preview
+npx wrangler kv:namespace create CLIENT_AUTH_TOKENS
+npx wrangler kv:namespace create CLIENT_AUTH_TOKENS --preview
+npx wrangler kv:namespace create PLATFORMS
+npx wrangler kv:namespace create PLATFORMS --preview`
 
 ## Contributing
+
 Report any issues using Github
 
 Build package:
-    `npm run build`
+`npm run build`
 
 Publish package:
-    `npm publish --access public`
+`npm publish --access public`
 
 ## License
+
 MIT
 This code is released as open source without any support or warranty. It is used by Atomic Jolt internally and is released in case someone finds it useful.

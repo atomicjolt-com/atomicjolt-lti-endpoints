@@ -3,10 +3,9 @@ import { expect, it, describe, vi, afterEach } from 'vitest';
 import type { EnvBindings } from '../types';
 import { handleNamesAndRoles } from './names_and_roles';
 import { setFakeToolJwt } from '../test/tool_helper';
-
+import { env } from "cloudflare:test";
 
 const app = new Hono<{ Bindings: EnvBindings }>();
-const env: EnvBindings = getMiniflareBindings();
 
 app.get('/lti/names_and_roles', (c) => handleNamesAndRoles(c));
 

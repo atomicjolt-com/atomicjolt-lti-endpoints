@@ -9,13 +9,12 @@ import type { EnvBindings } from '../types';
 import { setupValidState, storeState } from '../test/state_helper';
 import { handleLaunch } from './launch';
 import { deleteOIDC } from '../models/oidc';
+import { env } from "cloudflare:test";
 
 const app = new Hono<{ Bindings: EnvBindings }>();
 const initHashedScriptName = 'init.1234.js';
 const getToolJwt = () => Promise.resolve('fake_jwt');
 app.post('/lti/launch', (c) => handleLaunch(c, initHashedScriptName, getToolJwt));
-
-const env: EnvBindings = getMiniflareBindings();
 
 describe('launch', () => {
   it('returns a 200 with verified false when state is not present', async () => {
@@ -31,9 +30,6 @@ describe('launch', () => {
     const text = await resp.text();
     expect(resp.status).toBe(200);
     expect(text).toContain('"stateVerified":false');
-
-    // Clean up
-    await deleteOIDC(env, state);
   });
 
   it('returns a 401 when cookie is not present and lti_storage_target is empty', async () => {
@@ -57,11 +53,12 @@ describe('launch', () => {
     await deleteOIDC(env, state);
   });
 
-  it('fails when the state value in the cookie cannot be found in KV', async () => {
+  it('fails when the state value in the cookie cannot be found', async () => {
     const { body, state } = await setupValidState(env, TEST_ID_TOKEN);
 
     // Remove state from KV for test
     await deleteOIDC(env, state);
+
     const req = new Request(
       'http://example.com/lti/launch',
       {

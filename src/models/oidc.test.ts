@@ -1,45 +1,40 @@
 import { test, expect } from 'vitest';
-import { getOIDC } from './oidc';
+import { setOIDC, getOIDC } from './oidc';
+import type { OIDCStateDurableObject } from '../durable/oidc_state';
+import { env } from "cloudflare:test";
+import { OIDCState } from '@atomicjolt/lti-server';
 
 test('getOIDC returns OIDC state', async (_t) => {
   const state = 'test-state';
-  const oidcState = {
+  const oidcState: OIDCState = {
     state,
-    targetLinkUri: 'test-target-link-uri',
-    ltiMessageHint: 'test-lti-message-hint',
-    loginHint: 'test-login-hint',
-    clientId: 'test-client-id',
-    iss: 'test-iss',
+    nonce: crypto.randomUUID(),
+    datetime: new Date().toISOString(),
   };
-  const kvState = JSON.stringify(oidcState);
-  const c = {
-    env: {
-      OIDC: {
-        async get(_key: string) {
-          return kvState;
-        },
-      },
-    },
-  } as any;
-
-  const result = await getOIDC(c.env, state);
-
+  await setOIDC(env, oidcState);
+  const result = await getOIDC(env, state);
   expect(result).toEqual(oidcState);
 });
 
 test('getOIDC throws error for missing OIDC state', async (_t) => {
   const state = 'test-state';
-  const c = {
-    env: {
-      OIDC: {
-        async get(_key: string) {
-          return null;
-        },
-      },
+
+  // Mock Durable Object instance that throws error
+  const mockDurableObject = {
+    get: async () => {
+      throw new Error('Missing LTI state. Please launch the application again.');
     },
-  } as any;
+  } as unknown as OIDCStateDurableObject;
 
-  await expect(getOIDC(c.env, state)).rejects.toThrow('Missing LTI state. Please launch the application again.');
+  // Mock environment with OIDC_STATE
+  const env = {
+    OIDC_STATE: {
+      idFromName: (name: string) => ({ name }),
+      get: () => mockDurableObject,
+    },
+  };
 
-
+  await expect(getOIDC(env as any, state)).rejects.toThrow(
+    'Missing LTI state. Please launch the application again.'
+  );
 });

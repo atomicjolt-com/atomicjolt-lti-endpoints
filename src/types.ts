@@ -1,30 +1,31 @@
-import { KVNamespace, DurableObjectNamespace } from '@cloudflare/workers-types';
+import { KVNamespace } from '@cloudflare/workers-types';
 import type {
   InitSettings,
   LaunchSettings,
 } from '@atomicjolt/lti-client/types';
 import { MembershipContainer } from '@atomicjolt/lti-types';
 import { ContentItem } from './handlers/deep_link';
+import { OIDCStateDurableObject } from './durable/oidc_state';
 
 export type EnvBindings = {
-  OIDC: KVNamespace;
   KEY_SETS: KVNamespace;
   REMOTE_JWKS: KVNamespace;
-  JWT_KEYS: KVNamespace;
-  PLATFORMS: KVNamespace;
   CLIENT_AUTH_TOKENS: KVNamespace;
-  OIDC_STATE: DurableObjectNamespace;
+  PLATFORMS: KVNamespace;
+  OIDC_STATE: DurableObjectNamespace<OIDCStateDurableObject>;
+  ASSETS: Fetcher;
 }
 
 declare global {
-  function setupMiniflareIsolatedStorage(): Function;
-  function getMiniflareBindings(): EnvBindings;
   interface Window {
     INIT_SETTINGS: InitSettings;
     LAUNCH_SETTINGS: LaunchSettings;
   }
 }
 
+declare module "cloudflare:test" {
+  interface ProvidedEnv extends EnvBindings { }
+}
 
 //
 // Names and Roles

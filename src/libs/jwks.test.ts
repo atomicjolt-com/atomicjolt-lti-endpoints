@@ -1,12 +1,9 @@
 import { expect, it, describe } from 'vitest';
 import { TEST_ID_TOKEN, genJwt } from '@atomicjolt/lti-server';
-
 import { getJwkServer } from './jwks';
 import { setPlatform } from '../models/platforms';
 import { PlatformConfiguration } from '@atomicjolt/lti-types';
-
-
-const env = getMiniflareBindings();
+import { env } from "cloudflare:test";
 
 describe('getJwkServer', async () => {
   it('should return the jwks_uri of the platform', async () => {
@@ -17,7 +14,8 @@ describe('getJwkServer', async () => {
       authorization_endpoint: 'https://example.com/authorize',
       token_endpoint: 'https://example.com/token',
     };
-    setPlatform(env, iss, platform);
+
+    await setPlatform(env, iss, platform);
 
     const { signed } = await genJwt(TEST_ID_TOKEN);
     const result = await getJwkServer(env, signed);

@@ -1,0 +1,23 @@
+#
+# This file exists so that miniflare will work when running tests
+#
+
+compatibility_date = "2025-02-24"
+compatibility_flags = []
+name = "atomic-lti-endpoints"
+main = "src/index.ts"
+kv_namespaces = [
+  { binding = "KEY_SETS", id = "keys_sets", preview_id = "keys_sets" },
+  { binding = "JWKS", id = "jwks", preview_id = "jwks" },
+  { binding = "REMOTE_JWKS", id = "remote_jwks", preview_id = "remote_jwks" },
+  { binding = "CLIENT_AUTH_TOKENS", id = "client_auth_tokens", preview_id = "client_auth_tokens" },
+  { binding = "PLATFORMS", id = "platforms", preview_id = "platforms" },
+]
+
+durable_objects.bindings = [
+  { name = "OIDC_STATE", class_name = "OIDCStateDurableObject" },
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["OIDCStateDurableObject"]
