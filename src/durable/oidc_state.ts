@@ -9,13 +9,15 @@ interface StoredState {
 }
 
 export class OIDCStateDurableObject extends DurableObject<EnvBindings> {
-  private readonly CLEANUP_INTERVAL = 60 * 60 * 1000; // Cleanup every hour (in ms)
+  private readonly TTL = 5 * 60 * 1000; // 5 mins in milliseconds
 
   constructor(ctx: DurableObjectState, env: EnvBindings) {
     super(ctx, env);
 
-    // Schedule the first cleanup
-    this.ctx.storage.setAlarm(Date.now() + this.CLEANUP_INTERVAL);
+    // Use an alarm to handle time to live
+    this.ctx.blockConcurrencyWhile(async () => {
+      await this.ctx.storage.setAlarm(Date.now() + this.TTL);
+    });
   }
 
   // Store OIDC state with expiration
@@ -47,36 +49,12 @@ export class OIDCStateDurableObject extends DurableObject<EnvBindings> {
 
   // Manually delete the state
   async destroy(): Promise<void> {
-    try {
-      await this.ctx.storage.delete('state');
-    } catch (error) {
-      // Log error but don't throw, allowing cleanup to continue
-      console.error('Error deleting state during cleanup:', error);
-    }
+    await this.ctx.storage.deleteAll();
   }
 
   // Handle alarm events for cleanup
-  async alarm(): Promise<void> {
-    try {
-      // Get all stored items
-      const storedItems = await this.ctx.storage.list<StoredState>();
-      const now = Date.now();
-      let cleanupCount = 0;
-
-      // Check each item for expiration
-      for (const [key, value] of storedItems.entries()) {
-        if (value.expiresAt && now > value.expiresAt) {
-          await this.ctx.storage.delete(key);
-          cleanupCount++;
-        }
-      }
-
-      console.log(`Cleaned up ${cleanupCount} expired items`);
-    } catch (error) {
-      console.error('Error during scheduled cleanup:', error);
-    } finally {
-      // Reschedule the next cleanup
-      this.ctx.storage.setAlarm(Date.now() + this.CLEANUP_INTERVAL);
-    }
+  async alarm() {
+    await this.ctx.storage.deleteAll();
   }
+
 }
