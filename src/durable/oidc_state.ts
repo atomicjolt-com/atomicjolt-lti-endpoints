@@ -47,7 +47,6 @@ export class OIDCStateDurableObject extends DurableObject<EnvBindings> {
 
   // Manually delete the state
   async destroy(): Promise<void> {
-    //await this.ctx.storage.delete('state');
     try {
       await this.ctx.storage.delete('state');
     } catch (error) {

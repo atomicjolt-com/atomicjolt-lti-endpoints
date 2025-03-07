@@ -20,7 +20,7 @@ export async function validateRequest(
     throw new Error('Incorrect LTI state. Please launch the application again.');
   }
 
-  validateNonce(oidcState, validatedIdToken);
+  await validateNonce(oidcState, validatedIdToken);
 
   return validatedIdToken;
 }

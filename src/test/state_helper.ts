@@ -3,7 +3,7 @@ import {
   CANVAS_PUBLIC_JWKS_URL,
   IdToken,
 } from '@atomicjolt/lti-types';
-import type { OIDCState } from '@atomicjolt/lti-server';
+import type { KeySet, OIDCState } from '@atomicjolt/lti-server';
 import { ALGORITHM, generateKeySet, keySetsToJwks, signJwt } from '@atomicjolt/lti-server';
 import type { EnvBindings } from '../types';
 import { deleteKeySet, getKeySets } from '../models/key_sets';
@@ -27,7 +27,7 @@ export async function destroyKeySets(env: EnvBindings): Promise<void[]> {
   return Promise.all(promises);
 }
 
-export async function setupValidState(env: EnvBindings, token: IdToken): Promise<{ state: string, body: FormData, privateKey: KeyLike }> {
+export async function setupKeySets(env: EnvBindings): Promise<KeySet> {
   // Clean out entries
   await destroyKeySets(env);
 
@@ -40,6 +40,12 @@ export async function setupValidState(env: EnvBindings, token: IdToken): Promise
   };
   const jwks = await keySetsToJwks(keySetMap);
   await setRemoteJWKs(env, CANVAS_PUBLIC_JWKS_URL, jwks);
+
+  return keySet;
+}
+
+export async function setupValidState(env: EnvBindings, token: IdToken): Promise<{ state: string, body: FormData, privateKey: KeyLike }> {
+  const keySet = await setupKeySets(env);
 
   const state = crypto.randomUUID();
   await storeState(env, state, token.nonce);

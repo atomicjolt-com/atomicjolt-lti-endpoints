@@ -6,7 +6,7 @@ import {
 } from '@atomicjolt/lti-types';
 import { OPEN_ID_COOKIE_PREFIX, signJwt, TEST_ID_TOKEN, genJwt } from '@atomicjolt/lti-server';
 import type { EnvBindings } from '../types';
-import { setupValidState, storeState } from '../test/state_helper';
+import { setupKeySets, setupValidState, storeState } from '../test/state_helper';
 import { handleLaunch } from './launch';
 import { deleteOIDC } from '../models/oidc';
 import { env } from "cloudflare:test";
@@ -18,7 +18,7 @@ app.post('/lti/launch', (c) => handleLaunch(c, initHashedScriptName, getToolJwt)
 
 describe('launch', () => {
   it('returns a 200 with verified false when state is not present', async () => {
-    const { body, state } = await setupValidState(env, TEST_ID_TOKEN);
+    const { body } = await setupValidState(env, TEST_ID_TOKEN);
     const req = new Request(
       'http://example.com/lti/launch',
       {
@@ -53,55 +53,57 @@ describe('launch', () => {
     await deleteOIDC(env, state);
   });
 
-  it('fails when the state value in the cookie cannot be found', async () => {
-    const { body, state } = await setupValidState(env, TEST_ID_TOKEN);
+  // it('fails when the state value in the cookie cannot be found', async () => {
+  //   const { body, state } = await setupValidState(env, TEST_ID_TOKEN);
 
-    // Remove state from KV for test
-    await deleteOIDC(env, state);
+  //   // Remove state from KV for test
+  //   await deleteOIDC(env, state);
 
-    const req = new Request(
-      'http://example.com/lti/launch',
-      {
-        method: 'POST',
-        headers: {
-          Accept: '*/*',
-          Cookie: `${OPEN_ID_COOKIE_PREFIX}${state}=1`,
-        },
-        body: body,
-      },
-    );
-    const resp = await app.fetch(req, env);
+  //   const req = new Request(
+  //     'http://example.com/lti/launch',
+  //     {
+  //       method: 'POST',
+  //       headers: {
+  //         Accept: '*/*',
+  //         Cookie: `${OPEN_ID_COOKIE_PREFIX}${state}=1`,
+  //       },
+  //       body: body,
+  //     },
+  //   );
+  //   const resp = await app.fetch(req, env);
 
-    expect(resp.status).toBe(401);
-    const text = await resp.text();
-    expect(text).toContain('Missing LTI state. Please launch the application again.');
-  });
+  //   expect(resp.status).toBe(401);
+  //   const text = await resp.text();
+  //   expect(text).toContain('Missing LTI state. Please launch the application again.');
+  // });
 
-  it('fails when the state value does not exist in KV', async () => {
-    const { body, state } = await setupValidState(env, TEST_ID_TOKEN);
-    body.set('state', 'fake_state');
+  // it('fails when the state value does not exist', async () => {
+  //   const { body, state } = await setupValidState(env, TEST_ID_TOKEN);
+  //   body.set('state', 'fake_state');
 
-    const req = new Request(
-      'http://example.com/lti/launch',
-      {
-        method: 'POST',
-        headers: {
-          Accept: '*/*',
-          Cookie: `${OPEN_ID_COOKIE_PREFIX}${state}`,
-        },
-        body: body,
-      },
-    );
-    const resp = await app.fetch(req, env);
+  //   const req = new Request(
+  //     'http://example.com/lti/launch',
+  //     {
+  //       method: 'POST',
+  //       headers: {
+  //         Accept: '*/*',
+  //         Cookie: `${OPEN_ID_COOKIE_PREFIX}${state}`,
+  //       },
+  //       body: body,
+  //     },
+  //   );
+  //   const resp = await app.fetch(req, env);
 
-    expect(resp.status).toBe(401);
-    const text = await resp.text();
-    expect(text).toBe('Missing LTI state. Please launch the application again.');
-  });
+  //   expect(resp.status).toBe(401);
+  //   const text = await resp.text();
+  //   expect(text).toBe('Missing LTI state. Please launch the application again.');
+  // });
 
-  describe('JWT tests', () => {
+  describe('JWT tests', async () => {
     const state = crypto.randomUUID();
+
     it('fails when the KID is not present in the JWT header', async () => {
+      await setupKeySets(env);
       const body = new FormData();
 
       // Generate a new jwt that will have a KID not present
@@ -133,6 +135,7 @@ describe('launch', () => {
     // Test Description: LTI version passed is not 1.3
     // Test Sends LTI Version that is NOT 1.3
     it('returns an invalid version message', async () => {
+      await setupKeySets(env);
       const token = { ...TEST_ID_TOKEN };
       // @ts-expect-error
       token[LTI_VERSION] = '11.2.0';

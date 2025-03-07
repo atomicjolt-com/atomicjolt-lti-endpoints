@@ -18,5 +18,8 @@ export async function getOIDC(env: EnvBindings, state: string): Promise<OIDCStat
 export async function deleteOIDC(env: EnvBindings, state: string) {
   const id = env.OIDC_STATE.idFromName(state);
   const obj = env.OIDC_STATE.get(id) as unknown as OIDCStateDurableObject;
+  if (!obj) {
+    return;
+  }
   await obj.destroy();
 }
