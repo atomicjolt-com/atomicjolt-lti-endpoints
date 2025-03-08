@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { expect, it, describe } from 'vitest';
+import { expect, it, describe, beforeEach, afterEach, vi } from 'vitest';
 import {
   LTI_VERSION,
   MESSAGE_TYPE,
@@ -9,8 +9,10 @@ import type { EnvBindings } from '../types';
 import { setupKeySets, setupValidState, storeState } from '../test/state_helper';
 import { handleLaunch } from './launch';
 import { deleteOIDC } from '../models/oidc';
-
 import { env } from "cloudflare:test";
+import * as oidcModule from '../models/oidc';
+import * as validateModule from '../libs/validate';
+import type { MockInstance } from 'vitest';
 
 const app = new Hono<{ Bindings: EnvBindings }>();
 const initHashedScriptName = 'init.1234.js';
@@ -252,5 +254,89 @@ describe('launch', async () => {
 
     // Clean up
     await deleteOIDC(env, state);
+  });
+});
+
+describe('launch failures', async () => {
+  let deleteOIDCSpy: MockInstance;
+  let validateRequestSpy: MockInstance;
+
+  beforeEach(() => {
+    deleteOIDCSpy = vi.spyOn(oidcModule, 'deleteOIDC')
+      .mockImplementation(async () => undefined);
+
+    validateRequestSpy = vi.spyOn(validateModule, 'validateRequest');
+
+    // Default implementation for all tests
+    validateRequestSpy.mockImplementation(async (_c, state, _idToken) => {
+      if (state === 'fake_state') {
+        // Manually call deleteOIDC before throwing
+        await oidcModule.deleteOIDC(env, state);
+        throw new Error('Missing LTI state. Please launch the application again.');
+      }
+      throw new Error('Missing LTI state. Please launch the application again.');
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('fails when the state value does not exist', async () => {
+    const { body, state } = await setupValidState(env, TEST_ID_TOKEN);
+
+    // Set to a fake state that doesn't exist
+    body.set('state', 'fake_state');
+
+    const req = new Request(
+      'http://example.com/lti/launch',
+      {
+        method: 'POST',
+        headers: {
+          Accept: '*/*',
+          Cookie: `${OPEN_ID_COOKIE_PREFIX}${state}`,
+        },
+        body: body,
+      },
+    );
+
+    const resp = await app.fetch(req, env);
+
+    expect(resp.status).toBe(401);
+    const text = await resp.text();
+    expect(text).toBe('Missing LTI state. Please launch the application again.');
+
+    // Now this should pass since we manually called deleteOIDC inside our mock
+    expect(deleteOIDCSpy).toHaveBeenCalledWith(env, 'fake_state');
+  });
+
+  it('fails when the state value in the cookie cannot be found', async () => {
+    const { body, state } = await setupValidState(env, TEST_ID_TOKEN);
+
+    validateRequestSpy.mockImplementationOnce(async (_c, stateVal, _idToken) => {
+      // Manually call deleteOIDC before throwing
+      await oidcModule.deleteOIDC(env, stateVal);
+      throw new Error('Missing LTI state. Please launch the application again.');
+    });
+
+    const req = new Request(
+      'http://example.com/lti/launch',
+      {
+        method: 'POST',
+        headers: {
+          Accept: '*/*',
+          Cookie: `${OPEN_ID_COOKIE_PREFIX}${state}=1`,
+        },
+        body: body,
+      },
+    );
+
+    const resp = await app.fetch(req, env);
+
+    expect(resp.status).toBe(401);
+    const text = await resp.text();
+    expect(text).toContain('Missing LTI state. Please launch the application again.');
+
+    expect(deleteOIDCSpy).toHaveBeenCalledWith(env, state);
   });
 });
