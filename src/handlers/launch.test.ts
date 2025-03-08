@@ -9,6 +9,7 @@ import type { EnvBindings } from '../types';
 import { setupKeySets, setupValidState, storeState } from '../test/state_helper';
 import { handleLaunch } from './launch';
 import { deleteOIDC } from '../models/oidc';
+
 import { env } from "cloudflare:test";
 
 const app = new Hono<{ Bindings: EnvBindings }>();
@@ -16,7 +17,7 @@ const initHashedScriptName = 'init.1234.js';
 const getToolJwt = () => Promise.resolve('fake_jwt');
 app.post('/lti/launch', (c) => handleLaunch(c, initHashedScriptName, getToolJwt));
 
-describe('launch', () => {
+describe('launch', async () => {
   it('returns a 200 with verified false when state is not present', async () => {
     const { body } = await setupValidState(env, TEST_ID_TOKEN);
     const req = new Request(
@@ -52,52 +53,6 @@ describe('launch', () => {
     // Clean up
     await deleteOIDC(env, state);
   });
-
-  // it('fails when the state value in the cookie cannot be found', async () => {
-  //   const { body, state } = await setupValidState(env, TEST_ID_TOKEN);
-
-  //   // Remove state from KV for test
-  //   await deleteOIDC(env, state);
-
-  //   const req = new Request(
-  //     'http://example.com/lti/launch',
-  //     {
-  //       method: 'POST',
-  //       headers: {
-  //         Accept: '*/*',
-  //         Cookie: `${OPEN_ID_COOKIE_PREFIX}${state}=1`,
-  //       },
-  //       body: body,
-  //     },
-  //   );
-  //   const resp = await app.fetch(req, env);
-
-  //   expect(resp.status).toBe(401);
-  //   const text = await resp.text();
-  //   expect(text).toContain('Missing LTI state. Please launch the application again.');
-  // });
-
-  // it('fails when the state value does not exist', async () => {
-  //   const { body, state } = await setupValidState(env, TEST_ID_TOKEN);
-  //   body.set('state', 'fake_state');
-
-  //   const req = new Request(
-  //     'http://example.com/lti/launch',
-  //     {
-  //       method: 'POST',
-  //       headers: {
-  //         Accept: '*/*',
-  //         Cookie: `${OPEN_ID_COOKIE_PREFIX}${state}`,
-  //       },
-  //       body: body,
-  //     },
-  //   );
-  //   const resp = await app.fetch(req, env);
-
-  //   expect(resp.status).toBe(401);
-  //   const text = await resp.text();
-  //   expect(text).toBe('Missing LTI state. Please launch the application again.');
-  // });
 
   describe('JWT tests', async () => {
     const state = crypto.randomUUID();
