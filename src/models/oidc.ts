@@ -10,16 +10,25 @@ export async function setOIDC(env: EnvBindings, oidcState: OIDCState) {
 
 export async function getOIDC(env: EnvBindings, state: string): Promise<OIDCState> {
   const id = env.OIDC_STATE.idFromName(state);
-  const obj = env.OIDC_STATE.get(id) as unknown as OIDCStateDurableObject;
-  const oidcState = await obj.get();
-  return oidcState;
+  try {
+    const obj = env.OIDC_STATE.get(id) as unknown as OIDCStateDurableObject;
+    const oidcState = await obj.get();
+    return oidcState;
+  } catch (e) {
+    throw new Error('Missing LTI state. Please launch the application again.');
+  }
 }
 
 export async function deleteOIDC(env: EnvBindings, state: string) {
   const id = env.OIDC_STATE.idFromName(state);
-  const obj = env.OIDC_STATE.get(id) as unknown as OIDCStateDurableObject;
-  if (!obj) {
-    return;
+  try {
+    const obj = env.OIDC_STATE.get(id) as unknown as OIDCStateDurableObject;
+    if (!obj) {
+      return;
+    }
+    await obj.destroy();
+  } catch (e) {
+    // No need to throw an error if the object is not found
+    console.warn('deleteOIDC error can be ignored:', e);
   }
-  await obj.destroy();
 }

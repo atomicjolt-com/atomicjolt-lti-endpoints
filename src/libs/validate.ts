@@ -15,12 +15,17 @@ export async function validateRequest(
   }
 
   const validatedIdToken = await validateIdToken(idToken, c.env);
-  const oidcState = await getOIDC(c.env, state);
-  if (state !== oidcState.state) {
-    throw new Error('Incorrect LTI state. Please launch the application again.');
-  }
 
-  await validateNonce(oidcState, validatedIdToken);
+  const oidcState = await getOIDC(c.env, state);
+  if (oidcState) {
+    if (state !== oidcState.state) {
+      throw new Error('Incorrect LTI state. Please launch the application again.');
+    }
+
+    await validateNonce(oidcState, validatedIdToken);
+  } else {
+    throw new Error('Invalid LTI state. Please launch the application again.');
+  }
 
   return validatedIdToken;
 }

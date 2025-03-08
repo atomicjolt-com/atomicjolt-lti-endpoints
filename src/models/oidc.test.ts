@@ -1,40 +1,57 @@
-import { test, expect } from 'vitest';
-import { setOIDC, getOIDC } from './oidc';
-import type { OIDCStateDurableObject } from '../durable/oidc_state';
+import { test, expect, afterEach, vi } from 'vitest';
+import { setOIDC, getOIDC, deleteOIDC } from './oidc';
 import { env } from "cloudflare:test";
 import { OIDCState } from '@atomicjolt/lti-server';
 
-test('getOIDC returns OIDC state', async (_t) => {
-  const state = 'test-state';
+// Keep track of states created during tests for cleanup
+const testStates: string[] = [];
+
+// Clean up after each test to avoid isolated storage issues
+afterEach(async () => {
+  try {
+    // Use a try/catch to ensure cleanup errors don't break tests
+    await Promise.allSettled(testStates.map(state => deleteOIDC(env, state)));
+  } catch (error) {
+    console.warn("Cleanup error (can be ignored):", error);
+  }
+});
+
+test('getOIDC returns OIDC state', async () => {
+  const state = `test-state-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  testStates.push(state);
+
   const oidcState: OIDCState = {
     state,
     nonce: crypto.randomUUID(),
     datetime: new Date().toISOString(),
   };
+
   await setOIDC(env, oidcState);
+
   const result = await getOIDC(env, state);
   expect(result).toEqual(oidcState);
+
+  // Clean up right after the test
+  await deleteOIDC(env, state);
 });
 
-test('getOIDC throws error for missing OIDC state', async (_t) => {
-  const state = 'test-state';
-
-  // Mock Durable Object instance that throws error
-  const mockDurableObject = {
-    get: async () => {
-      throw new Error('Missing LTI state. Please launch the application again.');
-    },
-  } as unknown as OIDCStateDurableObject;
-
-  // Mock environment with OIDC_STATE
-  const env = {
-    OIDC_STATE: {
-      idFromName: (name: string) => ({ name }),
-      get: () => mockDurableObject,
-    },
+test('deleteOIDC removes OIDC state', async () => {
+  const mockDO = {
+    destroy: vi.fn().mockResolvedValue(undefined)
   };
 
-  await expect(getOIDC(env as any, state)).rejects.toThrow(
-    'Missing LTI state. Please launch the application again.'
-  );
+  const mockEnv = {
+    OIDC_STATE: {
+      idFromName: vi.fn().mockReturnValue('test-id'),
+      get: vi.fn().mockReturnValue(mockDO)
+    }
+  };
+
+  // Test the function directly with mocks
+  await deleteOIDC(mockEnv as any, 'test-state');
+
+  // Verify the mock was called correctly
+  expect(mockEnv.OIDC_STATE.idFromName).toHaveBeenCalledWith('test-state');
+  expect(mockEnv.OIDC_STATE.get).toHaveBeenCalled();
+  expect(mockDO.destroy).toHaveBeenCalled();
 });

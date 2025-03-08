@@ -3,7 +3,7 @@ import type { EnvBindings } from '../types';
 import { ALLOWED_LAUNCH_TIME, OIDCState } from "@atomicjolt/lti-server";
 
 // Interface for stored state with expiration
-interface StoredState {
+export interface StoredState {
   data: OIDCState;
   expiresAt: number;
 }
