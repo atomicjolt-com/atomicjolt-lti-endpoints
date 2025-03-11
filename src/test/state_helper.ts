@@ -1,4 +1,4 @@
-import { importPKCS8, KeyLike } from 'jose';
+import { importPKCS8 } from 'jose';
 import {
   CANVAS_PUBLIC_JWKS_URL,
   IdToken,
@@ -44,7 +44,7 @@ export async function setupKeySets(env: EnvBindings): Promise<KeySet> {
   return keySet;
 }
 
-export async function setupValidState(env: EnvBindings, token: IdToken): Promise<{ state: string, body: FormData, privateKey: KeyLike }> {
+export async function setupValidState(env: EnvBindings, token: IdToken): Promise<{ state: string, body: FormData, privateKey: CryptoKey | Uint8Array }> {
   const keySet = await setupKeySets(env);
 
   const state = crypto.randomUUID();

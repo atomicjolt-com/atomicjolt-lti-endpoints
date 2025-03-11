@@ -1,5 +1,4 @@
 import type { ClientCredentials, ClientAuthorizationResponse } from '@atomicjolt/lti-server';
-import { KeyLike } from 'jose';
 import { ClientCredentialsError, requestServiceToken, signJwt } from '@atomicjolt/lti-server';
 import { EnvBindings } from '../types';
 import { getClientCredential, setClientCredential } from '../models/client_credentials';
@@ -12,7 +11,7 @@ export async function requestServiceTokenCached(
   platformTokenUrl: string,
   scopes: string,
   kid: string,
-  rsaPrivateKey: KeyLike
+  rsaPrivateKey: CryptoKey | Uint8Array
 ): Promise<ClientAuthorizationResponse> {
 
   const credentialKey = clientId + scopes;
