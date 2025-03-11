@@ -22,7 +22,7 @@
   "devDependencies": {
     "@atomicjolt/lti-types": "^1.2",
     "@cloudflare/vitest-pool-workers": "^0.7",
-    "@cloudflare/workers-types": "^4.20250204.0",
+    "@cloudflare/workers-types": "^4.20250310.0",
     "@typescript-eslint/eslint-plugin": "^8.26",
     "@typescript-eslint/parser": "^8.26",
     "eslint-config-typescript": "^3.0.0",
