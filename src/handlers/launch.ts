@@ -14,7 +14,12 @@ import launchHtml from '../html/launch_html';
 import { getPlatform } from '../models/platforms';
 import { deleteOIDC } from '../models/oidc';
 
-export async function validateLaunchRequest(c: Context, getToolJwt: Function): Promise<LaunchSettings> {
+export type ValidateLaunchResponse = {
+  launchSettings: LaunchSettings;
+  idToken: IdToken;
+}
+
+export async function validateLaunchRequest(c: Context, getToolJwt: Function): Promise<ValidateLaunchResponse> {
   const body = (await c.req.parseBody()) as unknown as LTIRequestBody;
   let idToken: IdToken;
 
@@ -81,12 +86,15 @@ export async function validateLaunchRequest(c: Context, getToolJwt: Function): P
     deepLinking: idToken[DEEP_LINKING_CLAIM],
   };
 
-  return settings;
+  return {
+    launchSettings: settings,
+    idToken,
+  };
 }
 
 export type GetToolJwt = (c: Context, idToken: IdToken) => Promise<string>;
 
 export async function handleLaunch(c: Context, hashedScriptName: string, getToolJwt: GetToolJwt): Promise<Response> {
-  const settings = await validateLaunchRequest(c, getToolJwt);
-  return c.html(launchHtml(settings, hashedScriptName));
+  const { launchSettings } = await validateLaunchRequest(c, getToolJwt);
+  return c.html(launchHtml(launchSettings, hashedScriptName));
 }
