@@ -3,7 +3,8 @@ import { getCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
 import type { LaunchSettings } from '@atomicjolt/lti-client/types';
 import { DEEP_LINKING_CLAIM, IdToken, PlatformConfiguration } from '@atomicjolt/lti-types';
-import type { LTIRequestBody, } from '@atomicjolt/lti-server';
+import type { LTIRequestBody } from '@atomicjolt/lti-server';
+import { IdTokenWrapper } from '@atomicjolt/lti-server';
 import {
   getLtiStorageParams,
   OPEN_ID_COOKIE_PREFIX,
@@ -16,7 +17,7 @@ import { deleteOIDC } from '../models/oidc';
 
 export type ValidateLaunchResponse = {
   launchSettings: LaunchSettings;
-  idToken: IdToken;
+  idTokenWrapper: IdTokenWrapper;
 }
 
 export async function validateLaunchRequest(c: Context, getToolJwt: Function): Promise<ValidateLaunchResponse> {
@@ -86,9 +87,10 @@ export async function validateLaunchRequest(c: Context, getToolJwt: Function): P
     deepLinking: idToken[DEEP_LINKING_CLAIM],
   };
 
+  const idTokenWrapper = new IdTokenWrapper(idToken);
   return {
     launchSettings: settings,
-    idToken,
+    idTokenWrapper,
   };
 }
 
