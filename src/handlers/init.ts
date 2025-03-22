@@ -16,6 +16,7 @@ function writeCookie(c: Context, name: string, value: string, maxAge: number) {
     maxAge: maxAge,
     expires: new Date(Date.now() + maxAge * 1000),
     sameSite: 'None',
+    partitioned: true,
   });
 }
 

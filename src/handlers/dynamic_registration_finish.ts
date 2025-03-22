@@ -1,5 +1,5 @@
 import type { Context } from 'hono';
-import type { PlatformConfiguration, ToolConfiguration } from '@atomicjolt/lti-types';
+import type { PlatformConfiguration, ToolConfiguration, RegistrationConfiguration } from '@atomicjolt/lti-types';
 import dynamicRegistrationFinishHtml from "../html/dynamic_registration_finish_html";
 
 export type SecureJsonHeaders = {
@@ -9,8 +9,8 @@ export type SecureJsonHeaders = {
 };
 
 export type GetToolConfiguration = (platformConfig: PlatformConfiguration, host: string) => ToolConfiguration;
-export type HandlePlatformResponse = (platformResponse: ToolConfiguration) => void;
-export type RenderFinishHtml = (platformResponse: ToolConfiguration) => string;
+export type HandlePlatformResponse = (registrationConfiguration: RegistrationConfiguration) => void;
+export type RenderFinishHtml = (registrationConfiguration: RegistrationConfiguration) => string;
 
 // Finishes the registration process
 export async function handleDynamicRegistrationFinish(
@@ -47,14 +47,18 @@ export async function handleDynamicRegistrationFinish(
     headers,
     body: JSON.stringify(toolConfiguration)
   });
-  const platformResponse: ToolConfiguration = await response.json();
+  const platformToolConfiguration: ToolConfiguration = await response.json();
 
+  const registrationConfiguration: RegistrationConfiguration = {
+    platformConfiguration,
+    platformToolConfiguration,
+  };
   if (handlePlatformResponse) {
-    handlePlatformResponse(platformResponse);
+    handlePlatformResponse(registrationConfiguration);
   }
 
   if (renderFinishHtml) {
-    return c.html(renderFinishHtml(platformResponse));
+    return c.html(renderFinishHtml(registrationConfiguration));
   }
   return c.html(dynamicRegistrationFinishHtml());
 }
