@@ -12,6 +12,14 @@ async function handleDynamicRegistrationInit(
   const registrationToken = c.req.query('registration_token') as string;
   const openidConfigurationUrl = c.req.query('openid_configuration') as string;
 
+  if (!registrationToken) {
+    throw new Error('Invalid registration token.');
+  }
+
+  if (!openidConfigurationUrl) {
+    throw new Error('Invalid openid configuration URL.');
+  }
+
   // Get the platform configuration
   const response = await fetch(openidConfigurationUrl);
   const platformConfiguration = await response.json() as PlatformConfiguration;
