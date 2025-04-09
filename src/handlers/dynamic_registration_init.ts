@@ -9,12 +9,9 @@ async function handleDynamicRegistrationInit(
   dynamicRegistrationHtml: DynamicRegistrationHtml
 ): Promise<Response> {
   // Get the registration token and openid configuration URL from the query string
-  const registrationToken = c.req.query('registration_token') as string;
+  // registration_token is optional
+  const registrationToken = c.req.query('registration_token') || '' as string;
   const openidConfigurationUrl = c.req.query('openid_configuration') as string;
-
-  if (!registrationToken) {
-    throw new Error('Invalid registration token.');
-  }
 
   if (!openidConfigurationUrl) {
     throw new Error('Invalid openid configuration URL.');
