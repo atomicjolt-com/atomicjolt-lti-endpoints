@@ -1,7 +1,7 @@
 import type { Context } from 'hono';
 import { getCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
-import type { LaunchSettings } from '@atomicjolt/lti-client/types';
+import type { LaunchSettings } from '@atomicjolt/lti-client';
 import { DEEP_LINKING_CLAIM, IdToken, PlatformConfiguration } from '@atomicjolt/lti-types';
 import type { LTIRequestBody } from '@atomicjolt/lti-server';
 import { IdTokenWrapper } from '@atomicjolt/lti-server';

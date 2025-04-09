@@ -2,7 +2,7 @@ import { KVNamespace } from '@cloudflare/workers-types';
 import type {
   InitSettings,
   LaunchSettings,
-} from '@atomicjolt/lti-client/types';
+} from '@atomicjolt/lti-client';
 import { MembershipContainer } from '@atomicjolt/lti-types';
 import { ContentItem } from './handlers/deep_link';
 import { OIDCStateDurableObject } from './durable/oidc_state';

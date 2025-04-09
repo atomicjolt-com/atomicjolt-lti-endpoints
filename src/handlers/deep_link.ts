@@ -42,7 +42,7 @@ export async function handleSignDeepLink(c: Context): Promise<Response> {
     exp: (Date.now() / 1000) + (60 * 60), // 1 hour from now
     iat: Date.now() / 1000,
     nonce,
-    [MESSAGE_TYPE]: MessageTypes.LtiDeepLinkingRequest,
+    [MESSAGE_TYPE]: MessageTypes.LtiDeepLinkingResponse,
     [LTI_VERSION]: deepLinkVersion,
     [DEPLOYMENT_ID]: jwt.deploymentId,
     [CONTENT_ITEM_CLAIM]: contentItems,

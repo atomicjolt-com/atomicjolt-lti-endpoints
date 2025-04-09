@@ -1,4 +1,4 @@
-import type { LaunchSettings } from '@atomicjolt/lti-client/types';
+import type { LaunchSettings } from '@atomicjolt/lti-client';
 import html from './html';
 
 export default function launchHtml(settings: LaunchSettings, hashedScriptName: string) {

@@ -1,4 +1,4 @@
-import type { InitSettings } from '@atomicjolt/lti-client/types';
+import type { InitSettings } from '@atomicjolt/lti-client';
 import html from './html';
 
 export default function initHtml(settings: InitSettings, hashedScriptName: string) {
