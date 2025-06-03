@@ -51,6 +51,7 @@ export async function handleSignDeepLink(c: Context): Promise<Response> {
 
   const privateKeyPair = await getCurrentPrivateKey(c.env);
   const deepJwt = await signJwt(payload as any, privateKeyPair.privateKey, '1m', privateKeyPair.kid);
+  console.log(`Generated deep link JWT: ${deepJwt}`);
   const response = { jwt: deepJwt };
   const json = JSON.stringify(response);
 

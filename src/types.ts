@@ -3,7 +3,7 @@ import type {
   InitSettings,
   LaunchSettings,
 } from '@atomicjolt/lti-client';
-import { MembershipContainer } from '@atomicjolt/lti-types';
+import { CONTENT_ITEM_CLAIM, DEEP_LINKING_DATA_CLAIM, DEPLOYMENT_ID, LTI_VERSION, MembershipContainer, MESSAGE_TYPE } from '@atomicjolt/lti-types';
 import { ContentItem } from './handlers/deep_link';
 import { OIDCStateDurableObject } from './durable/oidc_state';
 
@@ -158,9 +158,9 @@ export interface DeepLinkPayload {
   exp: number;
   iat: number;
   nonce: string;
-  'https://purl.imsglobal.org/spec/lti/claim/message_type': string;
-  'https://purl.imsglobal.org/spec/lti/claim/version': string;
-  'https://purl.imsglobal.org/spec/lti/claim/deployment_id': string;
-  'https://purl.imsglobal.org/spec/lti-dl/claim/content_items': ContentItem[];
-  'https://purl.imsglobal.org/spec/lti-dl/claim/data'?: string;
+  [MESSAGE_TYPE]: string;
+  [LTI_VERSION]: string;
+  [DEPLOYMENT_ID]: string;
+  [CONTENT_ITEM_CLAIM]: ContentItem[];
+  [DEEP_LINKING_DATA_CLAIM]?: string;
 }
