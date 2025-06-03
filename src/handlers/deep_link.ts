@@ -11,7 +11,7 @@ import {
   LTI_VERSION,
   LtiVersions,
   MESSAGE_TYPE,
-  MessageTypes
+  MessageTypes,
 } from '@atomicjolt/lti-types';
 
 export const deepLinkVersion = LtiVersions.v1_3_0;
@@ -51,7 +51,6 @@ export async function handleSignDeepLink(c: Context): Promise<Response> {
 
   const privateKeyPair = await getCurrentPrivateKey(c.env);
   const deepJwt = await signJwt(payload as any, privateKeyPair.privateKey, '1m', privateKeyPair.kid);
-  console.log(`Generated deep link JWT: ${deepJwt}`);
   const response = { jwt: deepJwt };
   const json = JSON.stringify(response);
 
