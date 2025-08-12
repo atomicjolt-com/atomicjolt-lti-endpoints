@@ -9,7 +9,7 @@ export type SecureJsonHeaders = {
 };
 
 export type GetToolConfiguration = (platformConfig: PlatformConfiguration, host: string) => ToolConfiguration;
-export type HandlePlatformResponse = (registrationConfiguration: RegistrationConfiguration) => void;
+export type HandlePlatformResponse = (registrationConfiguration: RegistrationConfiguration, c: Context) => void;
 export type RenderFinishHtml = (registrationConfiguration: RegistrationConfiguration) => string;
 
 // Finishes the registration process
@@ -54,7 +54,7 @@ export async function handleDynamicRegistrationFinish(
     platformToolConfiguration,
   };
   if (handlePlatformResponse) {
-    handlePlatformResponse(registrationConfiguration);
+    handlePlatformResponse(registrationConfiguration, c);
   }
 
   if (renderFinishHtml) {
