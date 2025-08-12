@@ -1,6 +1,8 @@
 import type { Context } from 'hono';
-import type { PlatformConfiguration, ToolConfiguration, RegistrationConfiguration } from '@atomicjolt/lti-types';
+import { type PlatformConfiguration, type ToolConfiguration, type RegistrationConfiguration, LTI_PLATFORM_CONFIGURATION } from '@atomicjolt/lti-types';
 import dynamicRegistrationFinishHtml from "../html/dynamic_registration_finish_html";
+import { EnvBindings } from '../types';
+import { setPlatform } from '../models/platforms';
 
 export type SecureJsonHeaders = {
   'Content-Type': string
@@ -19,7 +21,7 @@ export async function handleDynamicRegistrationFinish(
   handlePlatformResponse: HandlePlatformResponse | null = null,
   renderFinishHtml: RenderFinishHtml | null = null,
 ): Promise<Response> {
-
+  const env = c.env as EnvBindings;
   const formData = await c.req.formData();
   const rawPlatformConfiguration = formData.get('platformConfiguration') as string;
   const platformConfiguration = JSON.parse(decodeURIComponent(rawPlatformConfiguration)) as PlatformConfiguration;
@@ -53,6 +55,30 @@ export async function handleDynamicRegistrationFinish(
     platformConfiguration,
     platformToolConfiguration,
   };
+
+  // Extract platform information from the registration
+  const iss = registrationConfiguration.platformConfiguration.issuer;
+  const platform: PlatformConfiguration = {
+    issuer: iss,
+    authorization_endpoint: registrationConfiguration.platformConfiguration.authorization_endpoint || '',
+    token_endpoint: registrationConfiguration.platformConfiguration.token_endpoint || '',
+    jwks_uri: registrationConfiguration.platformConfiguration.jwks_uri || '',
+    token_endpoint_auth_methods_supported: registrationConfiguration.platformConfiguration.token_endpoint_auth_methods_supported || [],
+    token_endpoint_auth_signing_alg_values_supported:
+      registrationConfiguration.platformConfiguration.token_endpoint_auth_signing_alg_values_supported || [],
+    registration_endpoint: registrationConfiguration.platformConfiguration.registration_endpoint || '',
+    scopes_supported: registrationConfiguration.platformConfiguration.scopes_supported || [],
+    response_types_supported: registrationConfiguration.platformConfiguration.response_types_supported || [],
+    subject_types_supported: registrationConfiguration.platformConfiguration.subject_types_supported || [],
+    id_token_signing_alg_values_supported: registrationConfiguration.platformConfiguration.id_token_signing_alg_values_supported || [],
+    claims_supported: registrationConfiguration.platformConfiguration.claims_supported || [],
+    authorization_server: registrationConfiguration.platformConfiguration.authorization_server || '',
+    [LTI_PLATFORM_CONFIGURATION]: registrationConfiguration.platformConfiguration[LTI_PLATFORM_CONFIGURATION],
+  };
+
+  // Store the platform configuration
+  await setPlatform(env, iss, platform);
+
   if (handlePlatformResponse) {
     handlePlatformResponse(registrationConfiguration, c);
   }
