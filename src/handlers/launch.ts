@@ -20,7 +20,9 @@ export type ValidateLaunchResponse = {
   idTokenWrapper: IdTokenWrapper;
 }
 
-export async function validateLaunchRequest(c: Context, getToolJwt: Function): Promise<ValidateLaunchResponse> {
+export type GetToolJwt = (c: Context, idToken: IdTokenWrapper) => Promise<string>;
+
+export async function validateLaunchRequest(c: Context, getToolJwt: GetToolJwt): Promise<ValidateLaunchResponse> {
   const body = (await c.req.parseBody()) as unknown as LTIRequestBody;
   let idToken: IdToken;
 
@@ -77,7 +79,8 @@ export async function validateLaunchRequest(c: Context, getToolJwt: Function): P
   }
 
   const ltiStorageParams = getLtiStorageParams(platform.authorization_endpoint, target);
-  const signed = await getToolJwt(c, idToken);
+  const idTokenWrapper = new IdTokenWrapper(idToken);
+  const signed = await getToolJwt(c, idTokenWrapper);
 
   const settings: LaunchSettings = {
     stateVerified,
@@ -87,14 +90,11 @@ export async function validateLaunchRequest(c: Context, getToolJwt: Function): P
     deepLinking: idToken[DEEP_LINKING_CLAIM],
   };
 
-  const idTokenWrapper = new IdTokenWrapper(idToken);
   return {
     launchSettings: settings,
     idTokenWrapper,
   };
 }
-
-export type GetToolJwt = (c: Context, idToken: IdToken) => Promise<string>;
 
 export async function handleLaunch(c: Context, hashedScriptName: string, getToolJwt: GetToolJwt): Promise<Response> {
   const { launchSettings } = await validateLaunchRequest(c, getToolJwt);
