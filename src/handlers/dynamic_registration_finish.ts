@@ -49,7 +49,23 @@ export async function handleDynamicRegistrationFinish(
     headers,
     body: JSON.stringify(toolConfiguration)
   });
-  const platformToolConfiguration: ToolConfiguration = await response.json();
+
+  // Debug logging for registration response
+  const responseText = await response.text();
+  console.log('Registration response status:', response.status);
+  console.log('Registration response headers:', response.headers);
+  console.log('Registration response body:', responseText);
+
+  if (!responseText) {
+    throw new Error(`Empty response from registration endpoint: ${registrationEndpoint}`);
+  }
+
+  let platformToolConfiguration: ToolConfiguration;
+  try {
+    platformToolConfiguration = JSON.parse(responseText);
+  } catch (e) {
+    throw new Error(`Invalid JSON response from registration endpoint: ${responseText}`);
+  }
 
   const registrationConfiguration: RegistrationConfiguration = {
     platformConfiguration,
