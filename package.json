@@ -1,6 +1,6 @@
 {
   "name": "@atomicjolt/lti-endpoints",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "description": "A library of endpoints that can be added to a hono app to handle an LTI launch",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,9 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -22,20 +24,20 @@
   "license": "MIT",
   "devDependencies": {
     "@atomicjolt/lti-types": "^1.2.7",
-    "@cloudflare/vitest-pool-workers": "^0.8.71",
-    "@cloudflare/workers-types": "^4.20250911.0",
-    "@typescript-eslint/eslint-plugin": "^8.43.0",
-    "@typescript-eslint/parser": "^8.43.0",
+    "@cloudflare/vitest-pool-workers": "^0.9.10",
+    "@cloudflare/workers-types": "^4.20251004.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.0",
+    "@typescript-eslint/parser": "^8.46.0",
     "eslint-config-typescript": "^3.0.0",
     "vitest": "^3.2.4",
-    "wrangler": "^4.35.0"
+    "wrangler": "^4.42.0"
   },
   "dependencies": {
     "@atomicjolt/lti-client": "2.7.0",
     "@atomicjolt/lti-server": "^3.3.2",
     "@atomicjolt/lti-types": "^1.1.6",
-    "hono": "^4.9.6",
-    "i18next": "^25.5.2",
+    "hono": "^4.9.10",
+    "i18next": "^25.5.3",
     "i18next-browser-languagedetector": "^8.2.0",
     "jose": "^6.1.0"
   }
