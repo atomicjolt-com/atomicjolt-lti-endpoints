@@ -10,10 +10,9 @@
     "strict": true,
     "alwaysStrict": true,
     "preserveConstEnums": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "sourceMap": true,
     "types": [
-      "node",
       "@cloudflare/workers-types",
       "@cloudflare/vitest-pool-workers"
     ],
