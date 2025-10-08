@@ -17,15 +17,8 @@ describe("OIDCStateDurableObject", () => {
 
   // Clean up after each test
   afterEach(async () => {
-    try {
-      // Clean up by running the destroy method
-      await runInDurableObject<OIDCStateDurableObject, void>(stub, async (instance) => {
-        await instance.destroy();
-      });
-    } catch (error) {
-      // Log cleanup errors but don't fail the test
-      console.error("Cleanup error:", error);
-    }
+    // Cloudflare test environment automatically handles durable object cleanup
+    // No manual cleanup needed
   });
 
   describe("constructor", () => {

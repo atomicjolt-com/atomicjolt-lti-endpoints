@@ -40,6 +40,7 @@ export async function getBasicToolJwt<T extends ToolJwt>(c: Context, idToken: Id
   const iss = idToken['iss'];
   const host = (new URL(c.req.url)).host;
   const deepLinkClaimData = idToken[DEEP_LINKING_CLAIM];
+
   const toolJwt = getDefaultToolJwt(
     clientId(idToken),
     idToken[DEPLOYMENT_ID],

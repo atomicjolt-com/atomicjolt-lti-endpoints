@@ -17,7 +17,7 @@ const result = {
   },
 };
 
-global.fetch = vi.fn()
+globalThis.fetch = vi.fn()
   .mockResolvedValueOnce({
     ok: true,
     headers: {
@@ -28,7 +28,7 @@ global.fetch = vi.fn()
     json: () => {
       return Promise.resolve(JSON.stringify(result));
     },
-  });
+  }) as any;
 
 describe('names_and_roles', () => {
   afterEach(() => {
